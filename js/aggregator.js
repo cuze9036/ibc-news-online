@@ -1,58 +1,56 @@
 // IBC News Online — Fully Automated News Aggregator Engine
-// Fetches RSS feeds via rss2json, rotates batches every 30 min, auto-posts to localStorage CMS
+// Fetches ALL feeds every 15 min, auto-rewrites and posts to localStorage CMS
 
 const AGG_KEY = 'ibc_news_aggregator';
 const AGG_LOG_KEY = 'ibc_news_agg_log';
-const AGG_BATCH_KEY = 'ibc_news_agg_batch';
 
 const DEFAULT_FEEDS = [
   // --- NATIONAL ---
-  { id: 'ndtv-india', name: 'NDTV India', url: 'https://feeds.feedburner.com/ndtvnews-india-news', category: 'national', enabled: true, batch: 0 },
-  { id: 'toi-india', name: 'Times of India', url: 'https://timesofindia.indiatimes.com/rssfeeds/296589292.cms', category: 'national', enabled: true, batch: 1 },
+  { id: 'ndtv-india', name: 'NDTV India', url: 'https://feeds.feedburner.com/ndtvnews-india-news', category: 'national', enabled: true },
+  { id: 'toi-india', name: 'Times of India', url: 'https://timesofindia.indiatimes.com/rssfeeds/296589292.cms', category: 'national', enabled: true },
 
   // --- INTERNATIONAL ---
-  { id: 'bbc-world', name: 'BBC World News', url: 'https://feeds.bbci.co.uk/news/world/rss.xml', category: 'international', enabled: true, batch: 0 },
-  { id: 'aljazeera', name: 'Al Jazeera', url: 'https://www.aljazeera.com/xml/rss/all.xml', category: 'international', enabled: true, batch: 2 },
+  { id: 'bbc-world', name: 'BBC World News', url: 'https://feeds.bbci.co.uk/news/world/rss.xml', category: 'international', enabled: true },
+  { id: 'aljazeera', name: 'Al Jazeera', url: 'https://www.aljazeera.com/xml/rss/all.xml', category: 'international', enabled: true },
 
   // --- POLITICS ---
-  { id: 'bbc-politics', name: 'BBC Politics', url: 'https://feeds.bbci.co.uk/news/politics/rss.xml', category: 'politics', enabled: true, batch: 1 },
-  { id: 'guardian-politics', name: 'Guardian Politics', url: 'https://www.theguardian.com/politics/rss', category: 'politics', enabled: true, batch: 3 },
+  { id: 'bbc-politics', name: 'BBC Politics', url: 'https://feeds.bbci.co.uk/news/politics/rss.xml', category: 'politics', enabled: true },
+  { id: 'guardian-politics', name: 'Guardian Politics', url: 'https://www.theguardian.com/politics/rss', category: 'politics', enabled: true },
 
   // --- BUSINESS ---
-  { id: 'bbc-business', name: 'BBC Business', url: 'https://feeds.bbci.co.uk/news/business/rss.xml', category: 'business', enabled: true, batch: 0 },
-  { id: 'cnbc', name: 'CNBC Top News', url: 'https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114', category: 'business', enabled: true, batch: 2 },
+  { id: 'bbc-business', name: 'BBC Business', url: 'https://feeds.bbci.co.uk/news/business/rss.xml', category: 'business', enabled: true },
+  { id: 'cnbc', name: 'CNBC Top News', url: 'https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114', category: 'business', enabled: true },
 
   // --- TECHNOLOGY ---
-  { id: 'bbc-tech', name: 'BBC Technology', url: 'https://feeds.bbci.co.uk/news/technology/rss.xml', category: 'technology', enabled: true, batch: 1 },
-  { id: 'techcrunch', name: 'TechCrunch', url: 'https://techcrunch.com/feed/', category: 'technology', enabled: true, batch: 3 },
+  { id: 'bbc-tech', name: 'BBC Technology', url: 'https://feeds.bbci.co.uk/news/technology/rss.xml', category: 'technology', enabled: true },
+  { id: 'techcrunch', name: 'TechCrunch', url: 'https://techcrunch.com/feed/', category: 'technology', enabled: true },
 
   // --- SPORTS ---
-  { id: 'bbc-sport', name: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rss.xml', category: 'sports', enabled: true, batch: 2 },
-  { id: 'espn-sports', name: 'ESPN Sports', url: 'https://www.espn.com/espn/rss/news', category: 'sports', enabled: true, batch: 0 },
+  { id: 'bbc-sport', name: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rss.xml', category: 'sports', enabled: true },
+  { id: 'espn-sports', name: 'ESPN Sports', url: 'https://www.espn.com/espn/rss/news', category: 'sports', enabled: true },
 
   // --- ENTERTAINMENT ---
-  { id: 'bbc-entertainment', name: 'BBC Entertainment', url: 'https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml', category: 'entertainment', enabled: true, batch: 1 },
-  { id: 'variety', name: 'Variety', url: 'https://variety.com/feed/', category: 'entertainment', enabled: true, batch: 3 },
+  { id: 'bbc-entertainment', name: 'BBC Entertainment', url: 'https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml', category: 'entertainment', enabled: true },
+  { id: 'variety', name: 'Variety', url: 'https://variety.com/feed/', category: 'entertainment', enabled: true },
 
   // --- HEALTH ---
-  { id: 'bbc-health', name: 'BBC Health', url: 'https://feeds.bbci.co.uk/news/health/rss.xml', category: 'health', enabled: true, batch: 2 },
+  { id: 'bbc-health', name: 'BBC Health', url: 'https://feeds.bbci.co.uk/news/health/rss.xml', category: 'health', enabled: true },
 
   // --- SCIENCE ---
-  { id: 'bbc-science', name: 'BBC Science', url: 'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml', category: 'science', enabled: true, batch: 3 },
-  { id: 'space-com', name: 'Space.com', url: 'https://www.space.com/feeds/all', category: 'science', enabled: true, batch: 0 },
+  { id: 'bbc-science', name: 'BBC Science', url: 'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml', category: 'science', enabled: true },
+  { id: 'space-com', name: 'Space.com', url: 'https://www.space.com/feeds/all', category: 'science', enabled: true },
 
   // --- OPINION ---
-  { id: 'guardian-opinion', name: 'Guardian Opinion', url: 'https://www.theguardian.com/commentisfree/rss', category: 'opinion', enabled: true, batch: 2 },
+  { id: 'guardian-opinion', name: 'Guardian Opinion', url: 'https://www.theguardian.com/commentisfree/rss', category: 'opinion', enabled: true },
 
   // --- WORLD ---
-  { id: 'guardian-world', name: 'Guardian World', url: 'https://www.theguardian.com/world/rss', category: 'world', enabled: true, batch: 3 },
+  { id: 'guardian-world', name: 'Guardian World', url: 'https://www.theguardian.com/world/rss', category: 'world', enabled: true },
 
   // --- LIFESTYLE ---
-  { id: 'lifehacker', name: 'Lifehacker', url: 'https://lifehacker.com/feed/rss', category: 'lifestyle', enabled: true, batch: 1 },
+  { id: 'lifehacker', name: 'Lifehacker', url: 'https://lifehacker.com/feed/rss', category: 'lifestyle', enabled: true },
 ];
 
-const NUM_BATCHES = 4;
-const AUTO_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+const AUTO_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
 const MAX_ARTICLE_AGE_MS = 72 * 60 * 60 * 1000; // 72 hours — auto-cleanup old aggregated articles
 const MAX_ARTICLES_TOTAL = 200; // cap to prevent localStorage bloat
 
@@ -68,21 +66,11 @@ function getAggConfig() {
       return cfg;
     }
   } catch {}
-  return { feeds: DEFAULT_FEEDS, autoFetch: true, intervalMinutes: 30, maxPerFeed: 4, lastFetch: null };
+  return { feeds: DEFAULT_FEEDS, autoFetch: true, intervalMinutes: 15, maxPerFeed: 4, lastFetch: null };
 }
 
 function saveAggConfig(config) {
   localStorage.setItem(AGG_KEY, JSON.stringify(config));
-}
-
-function getCurrentBatch() {
-  try { return parseInt(localStorage.getItem(AGG_BATCH_KEY) || '0', 10); } catch { return 0; }
-}
-
-function advanceBatch() {
-  const next = (getCurrentBatch() + 1) % NUM_BATCHES;
-  localStorage.setItem(AGG_BATCH_KEY, String(next));
-  return next;
 }
 
 function getAggLog() {
@@ -104,14 +92,66 @@ function clearAggLog() {
   localStorage.removeItem(AGG_LOG_KEY);
 }
 
-// Fetch single RSS feed via rss2json
+// Fetch single RSS feed — rss2json with retry, then allorigins fallback
 async function fetchFeed(feedUrl) {
-  const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
-  const resp = await fetch(apiUrl);
-  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-  const data = await resp.json();
-  if (data.status !== 'ok') throw new Error(data.message || 'Feed parse error');
-  return data.items || [];
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
+      const resp = await fetch(apiUrl);
+      if (resp.status === 429) {
+        if (attempt === 0) { await delay(10000); continue; }
+        throw new Error('rate-limited');
+      }
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      if (data.status !== 'ok') throw new Error(data.message || 'Feed parse error');
+      return data.items || [];
+    } catch (e) {
+      if (attempt === 1 || e.message !== 'rate-limited') return fetchFeedFallback(feedUrl);
+    }
+  }
+  return fetchFeedFallback(feedUrl);
+}
+
+function parseFeedXml(text) {
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, 'text/xml');
+  const items = [];
+  xml.querySelectorAll('item, entry').forEach(entry => {
+    const getTag = (tags) => {
+      for (const t of tags) {
+        const el = entry.querySelector(t);
+        if (el) return el.textContent || '';
+      }
+      return '';
+    };
+    const linkEl = entry.querySelector('link');
+    const link = linkEl ? (linkEl.getAttribute('href') || linkEl.textContent || '') : '';
+    const enc = entry.querySelector('enclosure');
+    const media = entry.querySelector('thumbnail, content');
+    const thumbnail = enc ? (enc.getAttribute('url') || '') : (media ? (media.getAttribute('url') || '') : '');
+    items.push({
+      title: getTag(['title']),
+      link,
+      description: getTag(['description', 'summary']),
+      content: getTag(['description', 'summary']),
+      pubDate: getTag(['pubDate', 'published', 'updated']),
+      thumbnail,
+    });
+  });
+  return items;
+}
+
+async function fetchFeedFallback(feedUrl) {
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}&t=${Date.now()}`;
+  try {
+    const resp = await fetch(proxyUrl);
+    if (resp.ok) {
+      const json = await resp.json();
+      if (json.contents && json.contents.includes('<')) return parseFeedXml(json.contents);
+    }
+  } catch {}
+  throw new Error('Fallback proxy failed');
 }
 
 // --- Google Gemini AI Rewriter (FREE) ---
@@ -344,25 +384,21 @@ function cleanupOldArticles() {
   }
 }
 
-// Run aggregator for current batch only
-async function runAggregator(forceBatch) {
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Run aggregator — ALL enabled feeds, staggered to avoid rate limits
+async function runAggregator() {
   const config = getAggConfig();
-  const batchNum = (forceBatch !== undefined) ? forceBatch : getCurrentBatch();
-  const feeds = config.feeds.filter(f => f.enabled && f.batch === batchNum);
-
-  if (feeds.length === 0) {
-    advanceBatch();
-    return { totalNew: 0, totalErrors: 0, results: [], feedsChecked: 0, batch: batchNum };
-  }
-
+  const feeds = config.feeds.filter(f => f.enabled);
   let totalNew = 0;
   let totalErrors = 0;
   const results = [];
 
-  // Cleanup before fetching
   cleanupOldArticles();
 
-  for (const feed of feeds) {
+  for (let i = 0; i < feeds.length; i++) {
+    const feed = feeds[i];
+    if (i > 0) await delay(6000);
     try {
       const items = await fetchFeed(feed.url);
       const limit = config.maxPerFeed || 4;
@@ -378,19 +414,17 @@ async function runAggregator(forceBatch) {
       }
 
       results.push({ feed: feed.name, status: 'ok', added, total: items.length });
-      addAggLog({ feed: feed.name, status: 'ok', added, total: items.length, batch: batchNum });
+      addAggLog({ feed: feed.name, status: 'ok', added, total: items.length });
     } catch (err) {
       totalErrors++;
       results.push({ feed: feed.name, status: 'error', error: err.message });
-      addAggLog({ feed: feed.name, status: 'error', error: err.message, batch: batchNum });
+      addAggLog({ feed: feed.name, status: 'error', error: err.message });
     }
   }
 
   config.lastFetch = new Date().toISOString();
   saveAggConfig(config);
-  advanceBatch();
 
-  // Refresh page UI if new articles arrived
   if (totalNew > 0) {
     if (typeof renderHero === 'function') try { renderHero(); } catch {}
     if (typeof renderLatestNews === 'function') try { renderLatestNews(); } catch {}
@@ -398,24 +432,8 @@ async function runAggregator(forceBatch) {
     if (typeof renderCategoryNews === 'function') try { renderCategoryNews('all'); } catch {}
   }
 
-  console.log(`[IBC Aggregator] Batch ${batchNum}: ${totalNew} new from ${feeds.length} feeds (${totalErrors} errors)`);
-  return { totalNew, totalErrors, results, feedsChecked: feeds.length, batch: batchNum };
-}
-
-// Run ALL batches at once (for manual/first-time use)
-async function runAggregatorFull() {
-  let totalNew = 0;
-  let totalErrors = 0;
-  for (let b = 0; b < NUM_BATCHES; b++) {
-    try {
-      const r = await runAggregator(b);
-      totalNew += r.totalNew;
-      totalErrors += r.totalErrors;
-    } catch (e) {
-      totalErrors++;
-    }
-  }
-  return { totalNew, totalErrors };
+  console.log(`[IBC Aggregator] ${totalNew} new articles from ${feeds.length} feeds (${totalErrors} errors)`);
+  return { totalNew, totalErrors, results, feedsChecked: feeds.length };
 }
 
 // Auto-scheduler
@@ -424,15 +442,13 @@ let aggTimer = null;
 function startAutoAggregator() {
   stopAutoAggregator();
 
-  // Run first batch immediately on start
   runAggregator().catch(e => console.warn('[IBC Aggregator] Initial fetch error:', e.message));
 
-  // Then run every 30 minutes
   aggTimer = setInterval(() => {
     runAggregator().catch(e => console.warn('[IBC Aggregator] Cycle error:', e.message));
   }, AUTO_INTERVAL_MS);
 
-  console.log('[IBC Aggregator] Auto-mode ON — cycling every 30 min across all categories');
+  console.log('[IBC Aggregator] Auto-mode ON — all feeds every 15 min');
 }
 
 function stopAutoAggregator() {
@@ -444,8 +460,7 @@ function addFeed(name, url, category) {
   const config = getAggConfig();
   const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   if (config.feeds.some(f => f.id === id || f.url === url)) return false;
-  const batch = config.feeds.length % NUM_BATCHES;
-  config.feeds.push({ id, name, url, category, enabled: true, batch });
+  config.feeds.push({ id, name, url, category, enabled: true });
   saveAggConfig(config);
   return true;
 }
