@@ -79,7 +79,7 @@ function renderHero() {
     html += `
       <div class="hero-main" onclick="openArticle('${mainArticle.id}')">
         <div class="hero-main-img">
-          ${mainArticle.image ? `<img src="${mainArticle.image}" alt="">` : `<div class="placeholder-img dark">${getCategoryIcon(mainArticle.category)}</div>`}
+          <img src="${articleImg(mainArticle)}" alt="" onerror="this.onerror=null;this.src='${getFallbackImg(mainArticle.category,mainArticle.id)}'">
         </div>
         <div class="hero-main-overlay"></div>
         <div class="hero-main-content">
@@ -101,7 +101,7 @@ function renderHero() {
     html += `
       <div class="hero-side-card" onclick="openArticle('${a.id}')">
         <div class="hero-side-img">
-          ${a.image ? `<img src="${a.image}" alt="">` : `<div class="placeholder-img">${getCategoryIcon(a.category)}</div>`}
+          <img src="${articleImg(a)}" alt="" onerror="this.onerror=null;this.src='${getFallbackImg(a.category,a.id)}'">
         </div>
         <div class="hero-side-info">
           <span class="category-tag">${cat ? cat.name : a.category}</span>
@@ -124,7 +124,7 @@ function renderLatestNews() {
     return `
       <div class="news-card" onclick="openArticle('${a.id}')">
         <div class="news-card-img">
-          ${a.image ? `<img src="${a.image}" alt="">` : `<div class="placeholder-img">${getCategoryIcon(a.category)}</div>`}
+          <img src="${articleImg(a)}" alt="" onerror="this.onerror=null;this.src='${getFallbackImg(a.category,a.id)}'">
           ${a.videoUrl ? '<span class="video-badge">&#9654; Video</span>' : ''}
         </div>
         <div class="news-card-body">
@@ -203,7 +203,7 @@ function renderCategoryNews(slug) {
   list.innerHTML = articles.map(a => `
     <div class="news-list-item" onclick="openArticle('${a.id}')">
       <div class="news-list-img">
-        ${a.image ? `<img src="${a.image}" alt="">` : `<div class="placeholder-img">${getCategoryIcon(a.category)}</div>`}
+        <img src="${articleImg(a)}" alt="" onerror="this.onerror=null;this.src='${getFallbackImg(a.category,a.id)}'">
       </div>
       <div class="news-list-content">
         <span class="category-tag">${slug}</span>
@@ -453,7 +453,7 @@ function performSearch() {
     container.innerHTML = results.map(a => `
       <div class="news-list-item" onclick="closeSearch();openArticle('${a.id}')">
         <div class="news-list-img">
-          ${a.image ? `<img src="${a.image}" alt="">` : `<div class="placeholder-img">${getCategoryIcon(a.category)}</div>`}
+          <img src="${articleImg(a)}" alt="" onerror="this.onerror=null;this.src='${getFallbackImg(a.category,a.id)}'">
         </div>
         <div class="news-list-content">
           <span class="category-tag">${a.category}</span>
@@ -485,7 +485,7 @@ function filterByCategory(slug, e) {
   container.innerHTML = articles.map(a => `
     <div class="news-list-item" onclick="closeSearch();openArticle('${a.id}')">
       <div class="news-list-img">
-        ${a.image ? `<img src="${a.image}" alt="">` : `<div class="placeholder-img">${getCategoryIcon(a.category)}</div>`}
+        <img src="${articleImg(a)}" alt="" onerror="this.onerror=null;this.src='${getFallbackImg(a.category,a.id)}'">
       </div>
       <div class="news-list-content">
         <span class="category-tag">${a.category}</span>
@@ -508,7 +508,7 @@ function showAllNews(e) {
   container.innerHTML = articles.map(a => `
     <div class="news-list-item" onclick="closeSearch();openArticle('${a.id}')">
       <div class="news-list-img">
-        ${a.image ? `<img src="${a.image}" alt="">` : `<div class="placeholder-img">${getCategoryIcon(a.category)}</div>`}
+        <img src="${articleImg(a)}" alt="" onerror="this.onerror=null;this.src='${getFallbackImg(a.category,a.id)}'">
       </div>
       <div class="news-list-content">
         <span class="category-tag">${a.category}</span>
@@ -610,19 +610,35 @@ function formatViews(n) {
 }
 
 function getCategoryIcon(cat) {
-  const icons = {
-    national: '&#127470;&#127475;',
-    international: '&#127758;',
-    politics: '&#127963;',
-    business: '&#128200;',
-    technology: '&#128187;',
-    sports: '&#9917;',
-    entertainment: '&#127916;',
-    health: '&#128138;',
-    science: '&#128300;',
-    opinion: '&#128172;',
-    world: '&#127758;',
-    lifestyle: '&#127796;'
+  const svgs = {
+    national: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+    international: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    politics: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>',
+    business: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+    technology: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+    sports: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 0 0 0 20M12 2a7 7 0 0 1 0 20M2 12h20"/></svg>',
+    entertainment: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/><line x1="17" y1="17" x2="22" y2="17"/></svg>',
+    health: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+    science: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6v7l5 8H4l5-8V3z"/><line x1="8" y1="3" x2="16" y2="3"/><circle cx="12" cy="16" r="1"/></svg>',
+    opinion: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    world: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    lifestyle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
   };
-  return icons[cat] || '&#128240;';
+  return svgs[cat] || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z M7 8h10M7 12h10M7 16h6"/></svg>';
+}
+
+function proxyImg(url) {
+  if (!url) return '';
+  if (url.startsWith('data:') || url.includes('wsrv.nl')) return url;
+  return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=800&h=450&fit=cover&output=webp`;
+}
+
+function getFallbackImg(cat, id) {
+  const seed = id || cat || 'news';
+  return `https://picsum.photos/seed/${seed}/800/450`;
+}
+
+function articleImg(article) {
+  if (article.image) return proxyImg(article.image);
+  return getFallbackImg(article.category, article.id);
 }

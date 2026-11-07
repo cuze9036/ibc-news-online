@@ -1154,9 +1154,12 @@ ul, ol { list-style: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
   color: #bbb;
   background: linear-gradient(135deg, #e8e8e8 0%, #d4d4d4 100%);
+}
+.placeholder-img svg {
+  width: 48px;
+  height: 48px;
 }
 .placeholder-img.dark {
   background: linear-gradient(135deg, #2d2d4e 0%, #1a1a2e 100%);
