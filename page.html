@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">IBC News Online</title>
+  <meta name="copyright" content="Copyright IBC News Online. All Rights Reserved.">
+  <meta name="author" content="IBC News Online — ibcnews.online">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23D32F2F' rx='12' width='100' height='100'/><text x='50' y='68' font-size='40' font-weight='900' fill='white' text-anchor='middle' font-family='Arial'>IBC</text></svg>">
+  <style>
+    .page-hero { background: var(--primary); color: #fff; padding: 50px 0 40px; }
+    .page-hero h1 { font-size: 36px; font-weight: 900; margin-bottom: 8px; }
+    .page-hero .breadcrumb { font-size: 13px; opacity: 0.8; }
+    .page-hero .breadcrumb a { color: #fff; text-decoration: underline; }
+    .page-content { padding: 40px 0 60px; }
+    .page-body { max-width: 900px; }
+    .page-body h2 { font-size: 24px; font-weight: 800; margin: 30px 0 14px; color: var(--primary); }
+    .page-body h3 { font-size: 18px; font-weight: 700; margin: 24px 0 10px; }
+    .page-body p { font-size: 15px; line-height: 1.8; margin-bottom: 16px; color: var(--text-secondary); }
+    .page-body ul { padding-left: 20px; margin-bottom: 16px; list-style: disc; }
+    .page-body ul li { font-size: 15px; line-height: 1.8; margin-bottom: 8px; color: var(--text-secondary); }
+    .page-body a { color: var(--primary); text-decoration: underline; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
+    .contact-card { background: var(--bg-card); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+    .contact-card h3 { margin-top: 0; color: var(--text); }
+    .contact-card p { margin-bottom: 6px; }
+    .contact-form { margin-top: 30px; }
+    .contact-form .form-group { margin-bottom: 16px; }
+    .contact-form label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .contact-form input, .contact-form textarea, .contact-form select {
+      width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 14px; font-family: var(--font); outline: none; background: var(--bg-card); color: var(--text);
+    }
+    .contact-form input:focus, .contact-form textarea:focus { border-color: var(--primary); }
+    .contact-form textarea { min-height: 140px; resize: vertical; }
+    .contact-form button { background: var(--primary); color: #fff; border: none; padding: 14px 36px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; font-family: var(--font); }
+    .contact-form button:hover { background: var(--primary-dark); }
+    .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 20px; }
+    .team-card { background: var(--bg-card); border-radius: var(--radius); padding: 24px; text-align: center; box-shadow: var(--shadow); }
+    .team-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 900; margin: 0 auto 14px; }
+    .team-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .team-card p { font-size: 13px; color: var(--text-light); margin-bottom: 0; }
+    .career-card { background: var(--bg-card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .career-card h3 { margin: 0 0 4px; font-size: 17px; }
+    .career-card .career-meta { font-size: 13px; color: var(--text-light); }
+    .career-card .btn-apply { background: var(--primary); color: #fff; border: none; padding: 10px 24px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font); white-space: nowrap; }
+    .ad-packages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 20px; }
+    .ad-card { background: var(--bg-card); border-radius: var(--radius); padding: 28px; text-align: center; box-shadow: var(--shadow); border-top: 4px solid var(--primary); }
+    .ad-card h3 { font-size: 20px; margin: 0 0 8px; color: var(--text); }
+    .ad-card .price { font-size: 32px; font-weight: 900; color: var(--primary); margin-bottom: 16px; }
+    .ad-card .price span { font-size: 14px; font-weight: 400; color: var(--text-light); }
+    .ad-card ul { text-align: left; padding-left: 0; list-style: none; }
+    .ad-card ul li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .ad-card ul li::before { content: "✓ "; color: var(--primary); font-weight: 700; }
+    .ad-card .btn-apply { margin-top: 20px; width: 100%; }
+    .tipline-box { background: var(--primary); color: #fff; border-radius: var(--radius); padding: 40px; text-align: center; margin-top: 30px; }
+    .tipline-box h2 { color: #fff; font-size: 28px; margin-bottom: 12px; }
+    .tipline-box p { color: rgba(255,255,255,0.85); font-size: 15px; margin-bottom: 20px; }
+    .submit-story-form { max-width: 700px; margin: 0 auto; }
+    @media (max-width: 768px) {
+      .contact-grid, .team-grid, .ad-packages { grid-template-columns: 1fr; }
+      .career-card { flex-direction: column; gap: 12px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="main-header">
+    <div class="container">
+      <div class="header-content">
+        <a href="index.html" class="logo">
+          IBC<span class="logo-highlight">NEWS</span>
+          <span class="logo-sub">Your Trusted Source</span>
+        </a>
+        <div class="search-box">
+          <input type="text" placeholder="Search news..." onkeyup="if(event.key==='Enter')window.location='index.html'">
+          <button onclick="window.location='index.html'">&#128269;</button>
+        </div>
+        <div class="header-actions">
+          <button class="theme-toggle" id="themeToggle" onclick="toggleThemePage()" aria-label="Toggle dark mode">&#9790;</button>
+          <a href="admin.html" class="btn-admin" style="text-decoration:none;">Admin Panel</a>
+          <button class="hamburger" onclick="document.getElementById('pageNav').style.display=document.getElementById('pageNav').style.display==='none'?'block':''" aria-label="Menu">&#9776;</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Nav -->
+  <nav class="main-nav" id="pageNav">
+    <div class="container">
+      <ul class="nav-list">
+        <li><a href="index.html" class="nav-home">&#127968; Home</a></li>
+        <li><a href="index.html#national">National</a></li>
+        <li><a href="index.html#international">International</a></li>
+        <li><a href="index.html#politics">Politics</a></li>
+        <li><a href="index.html#business">Business</a></li>
+        <li><a href="index.html#technology">Technology</a></li>
+        <li><a href="index.html#sports">Sports</a></li>
+        <li><a href="index.html#entertainment">Entertainment</a></li>
+        <li><a href="index.html#health">Health</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Hero -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / <span id="breadcrumbTitle"></span></div>
+      <h1 id="heroTitle"></h1>
+    </div>
+  </section>
+
+  <!-- Page Content -->
+  <section class="page-content">
+    <div class="container">
+      <div class="page-body" id="pageBody"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo">IBC<span class="logo-highlight">NEWS</span></div>
+          <p>IBC News Online delivers breaking news, in-depth analysis, and comprehensive coverage of national and international events. Stay informed with trusted journalism.</p>
+          <div class="footer-social">
+            <a href="#">FB</a> <a href="#">X</a> <a href="#">YT</a> <a href="#">IG</a> <a href="#">LI</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h3>Categories</h3>
+          <ul>
+            <li><a href="index.html">National</a></li>
+            <li><a href="index.html">International</a></li>
+            <li><a href="index.html">Politics</a></li>
+            <li><a href="index.html">Business</a></li>
+            <li><a href="index.html">Technology</a></li>
+            <li><a href="index.html">Sports</a></li>
+            <li><a href="index.html">Entertainment</a></li>
+            <li><a href="index.html">Health</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="page.html?p=about">About Us</a></li>
+            <li><a href="page.html?p=contact">Contact</a></li>
+            <li><a href="page.html?p=advertise">Advertise</a></li>
+            <li><a href="page.html?p=careers">Careers</a></li>
+            <li><a href="page.html?p=privacy">Privacy Policy</a></li>
+            <li><a href="page.html?p=terms">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Contact Us</h3>
+          <ul>
+            <li style="margin-bottom:14px;line-height:1.6;font-size:13px;">
+              IBC News Online<br>Media House, Sector 12<br>support@ibcnews.online
+            </li>
+            <li><a href="page.html?p=tipline">Tip Line</a></li>
+            <li><a href="page.html?p=submit">Submit a Story</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">&copy; <script>document.write(new Date().getFullYear())</script> IBC News Online. All Rights Reserved. Unauthorized reproduction, distribution, or transmission of any content on this website is strictly prohibited without prior written consent. | ibcnews.online</div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+  // Theme
+  (function(){
+    try {
+      const s = localStorage.getItem('ibc_theme');
+      if (s) { document.documentElement.setAttribute('data-theme', s); updateIcon(s); }
+    } catch {}
+  })();
+  function toggleThemePage() {
+    const c = document.documentElement.getAttribute('data-theme');
+    const n = c === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', n);
+    try { localStorage.setItem('ibc_theme', n); } catch {}
+    updateIcon(n);
+  }
+  function updateIcon(t) {
+    const b = document.getElementById('themeToggle');
+    if (b) b.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // Pages content
+  const PAGES = {
+    about: {
+      title: 'About Us',
+      content: `
+        <h2>Who We Are</h2>
+        <p>IBC News Online is a leading digital news platform dedicated to delivering accurate, timely, and comprehensive news coverage to readers worldwide. Founded with a vision to bridge the gap between local stories and global audiences, we have grown into a trusted source for millions of readers across the globe.</p>
+        <p>Our newsroom operates 24/7, ensuring that breaking news reaches you the moment it happens. We combine the speed of digital journalism with the depth and rigor of traditional reporting to bring you stories that matter.</p>
+
+        <h2>Our Mission</h2>
+        <p>To empower citizens with accurate, unbiased, and timely information that helps them make informed decisions. We believe that a well-informed public is the cornerstone of a functioning democracy, and we are committed to upholding the highest standards of journalistic integrity.</p>
+
+        <h2>What We Cover</h2>
+        <ul>
+          <li><strong>National News</strong> — Comprehensive coverage of domestic politics, governance, policy changes, and events shaping the nation</li>
+          <li><strong>International News</strong> — Global affairs, diplomatic developments, international conflicts, and cross-border stories that impact our interconnected world</li>
+          <li><strong>Politics</strong> — In-depth analysis of political campaigns, elections, legislation, and the people who shape public policy</li>
+          <li><strong>Business &amp; Economy</strong> — Market movements, corporate news, startup ecosystem, trade policies, and economic indicators</li>
+          <li><strong>Technology</strong> — Innovation, AI developments, cybersecurity, gadget reviews, and the tech industry's impact on society</li>
+          <li><strong>Sports</strong> — Live scores, match analyses, athlete profiles, tournament coverage, and sports business</li>
+          <li><strong>Entertainment</strong> — Film, music, television, streaming, celebrity news, and cultural events</li>
+          <li><strong>Health &amp; Science</strong> — Medical breakthroughs, public health advisories, research findings, and space exploration</li>
+          <li><strong>Opinion &amp; Analysis</strong> — Expert commentary, editorials, and thought-provoking perspectives on current affairs</li>
+          <li><strong>Lifestyle</strong> — Travel, food, wellness, fashion, and human interest stories</li>
+        </ul>
+
+        <h2>Our Values</h2>
+        <ul>
+          <li><strong>Accuracy First</strong> — Every story is fact-checked before publication. We correct errors promptly and transparently.</li>
+          <li><strong>Independence</strong> — Our editorial decisions are not influenced by advertisers, political parties, or any external pressure.</li>
+          <li><strong>Fairness</strong> — We present multiple perspectives and give all parties a fair opportunity to respond.</li>
+          <li><strong>Transparency</strong> — We are open about our methods, sources, and any potential conflicts of interest.</li>
+          <li><strong>Public Interest</strong> — We prioritize stories that serve the public good over sensationalism.</li>
+        </ul>
+
+        <h2>Our Team</h2>
+        <p>Our award-winning team of journalists, editors, photographers, and multimedia producers brings decades of combined experience in news reporting. From seasoned correspondents to fresh digital-native reporters, our diverse newsroom reflects the communities we serve.</p>
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-avatar">RK</div>
+            <h4>Rajesh Kumar</h4>
+            <p>Editor-in-Chief</p>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">SM</div>
+            <h4>Sarah Mitchell</h4>
+            <p>International Bureau Chief</p>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">AP</div>
+            <h4>Arun Patel</h4>
+            <p>Head of Digital</p>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">PS</div>
+            <h4>Priya Sharma</h4>
+            <p>Senior Political Correspondent</p>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">JC</div>
+            <h4>James Chen</h4>
+            <p>Technology Editor</p>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">NK</div>
+            <h4>Neha Kapoor</h4>
+            <p>Business & Economy Editor</p>
+          </div>
+        </div>
+
+        <h2>Contact the Newsroom</h2>
+        <p>Have a news tip? Want to reach our editorial team? Email us at <a href="mailto:support@ibcnews.online">support@ibcnews.online</a> or visit our <a href="page.html?p=contact">Contact page</a>.</p>
+      `
+    },
+    contact: {
+      title: 'Contact Us',
+      content: `
+        <h2>Get in Touch</h2>
+        <p>We'd love to hear from you. Whether you have a news tip, feedback about our coverage, a business inquiry, or just want to say hello — reach out and we'll get back to you as soon as possible.</p>
+
+        <div class="contact-grid">
+          <div class="contact-card">
+            <h3>&#128233; Editorial</h3>
+            <p><strong>Email:</strong> support@ibcnews.online</p>
+            <p><strong>Tips:</strong> support@ibcnews.online</p>
+            <p>For news tips, story ideas, press releases, and editorial inquiries.</p>
+          </div>
+          <div class="contact-card">
+            <h3>&#128188; Business</h3>
+            <p><strong>Email:</strong> support@ibcnews.online</p>
+            <p><strong>Advertising:</strong> support@ibcnews.online</p>
+            <p>For partnerships, advertising, sponsorships, and business development.</p>
+          </div>
+          <div class="contact-card">
+            <h3>&#128100; Careers</h3>
+            <p><strong>Email:</strong> support@ibcnews.online</p>
+            <p><strong>Internships:</strong> support@ibcnews.online</p>
+            <p>For job applications, internship opportunities, and freelance pitches.</p>
+          </div>
+          <div class="contact-card">
+            <h3>&#128736; Technical Support</h3>
+            <p><strong>Email:</strong> support@ibcnews.online</p>
+            <p><strong>Report a Bug:</strong> support@ibcnews.online</p>
+            <p>For website issues, app problems, and technical feedback.</p>
+          </div>
+        </div>
+
+        <h2>Office Address</h2>
+        <p><strong>IBC News Online — Head Office</strong><br>
+        Media House, Plot No. 15, Sector 12<br>
+        Navi Mumbai, Maharashtra 400614<br>
+        India</p>
+        <p><strong>Phone:</strong> +91-22-4000-XXXX (Replace with your number)<br>
+        <strong>Fax:</strong> +91-22-4000-XXXX</p>
+
+        <h2>Send Us a Message</h2>
+        <div class="contact-form">
+          <div class="form-group">
+            <label>Your Name *</label>
+            <input type="text" id="contactName" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" id="contactEmail" placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label>Subject *</label>
+            <select id="contactSubject">
+              <option>News Tip</option>
+              <option>Editorial Feedback</option>
+              <option>Advertising Inquiry</option>
+              <option>Partnership Proposal</option>
+              <option>Technical Issue</option>
+              <option>General Inquiry</option>
+              <option>Complaint</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Message *</label>
+            <textarea id="contactMsg" placeholder="Write your message here..."></textarea>
+          </div>
+          <button onclick="showToast('Message sent! We will respond within 24 hours.')">Send Message</button>
+        </div>
+      `
+    },
+    privacy: {
+      title: 'Privacy Policy',
+      content: `
+        <p><em>Last updated: November 7, 2026</em></p>
+
+        <h2>1. Introduction</h2>
+        <p>IBC News Online ("we," "us," or "our") respects your privacy and is committed to protecting your personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website ibcnews.online (the "Site") and use our services.</p>
+
+        <h2>2. Information We Collect</h2>
+        <h3>2.1 Information You Provide</h3>
+        <ul>
+          <li>Name and email address when subscribing to our newsletter</li>
+          <li>Contact information when submitting a news tip or story</li>
+          <li>Messages sent through our contact forms</li>
+          <li>Account information if you register for commenting</li>
+        </ul>
+        <h3>2.2 Automatically Collected Information</h3>
+        <ul>
+          <li>IP address and approximate geographic location</li>
+          <li>Browser type, operating system, and device information</li>
+          <li>Pages visited, time spent on pages, and navigation paths</li>
+          <li>Referring website or source</li>
+        </ul>
+
+        <h2>3. How We Use Your Information</h2>
+        <ul>
+          <li>To deliver and improve our news content and services</li>
+          <li>To send newsletters and breaking news alerts you subscribed to</li>
+          <li>To respond to your inquiries and feedback</li>
+          <li>To analyze website traffic and optimize user experience</li>
+          <li>To display relevant advertisements</li>
+          <li>To prevent fraud and ensure website security</li>
+        </ul>
+
+        <h2>4. Cookies &amp; Tracking</h2>
+        <p>We use cookies and similar tracking technologies to enhance your experience. You can manage cookie preferences through your browser settings. Essential cookies are required for the website to function properly.</p>
+
+        <h2>5. Data Sharing</h2>
+        <p>We do not sell your personal information. We may share data with:</p>
+        <ul>
+          <li>Analytics providers (Google Analytics) to understand website usage</li>
+          <li>Advertising partners to serve relevant advertisements</li>
+          <li>Law enforcement when required by law or to protect our rights</li>
+          <li>Service providers who assist in operating our website</li>
+        </ul>
+
+        <h2>6. Data Security</h2>
+        <p>We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the Internet is 100% secure.</p>
+
+        <h2>7. Your Rights</h2>
+        <p>You have the right to:</p>
+        <ul>
+          <li>Access, correct, or delete your personal data</li>
+          <li>Withdraw consent for data processing at any time</li>
+          <li>Opt out of marketing communications</li>
+          <li>Request a copy of your data in a portable format</li>
+          <li>Lodge a complaint with a data protection authority</li>
+        </ul>
+
+        <h2>8. Children's Privacy</h2>
+        <p>Our services are not directed to children under 13. We do not knowingly collect personal information from children. If you believe we have collected data from a child, please contact us immediately.</p>
+
+        <h2>9. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy periodically. Changes will be posted on this page with an updated revision date. Continued use of the Site after changes constitutes acceptance of the revised policy.</p>
+
+        <h2>10. Contact Us</h2>
+        <p>For privacy-related questions or requests, contact our Data Protection Officer:<br>
+        <strong>Email:</strong> support@ibcnews.online<br>
+        <strong>Address:</strong> IBC News Online, Media House, Sector 12, Navi Mumbai</p>
+      `
+    },
+    terms: {
+      title: 'Terms of Service',
+      content: `
+        <p><em>Last updated: November 7, 2026</em></p>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing and using IBC News Online (ibcnews.online), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our website.</p>
+
+        <h2>2. Use of Content</h2>
+        <p>All content published on IBC News Online, including articles, photographs, graphics, videos, and logos, is protected by copyright and intellectual property laws. You may:</p>
+        <ul>
+          <li>Read and share articles via social media sharing buttons provided</li>
+          <li>Quote brief excerpts with proper attribution and a link back to the original article</li>
+          <li>Print articles for personal, non-commercial use</li>
+        </ul>
+        <p>You may not:</p>
+        <ul>
+          <li>Reproduce, republish, or redistribute our content without written permission</li>
+          <li>Use our content for commercial purposes without a licensing agreement</li>
+          <li>Remove copyright notices or attribution from any content</li>
+          <li>Frame or embed our website on another site without permission</li>
+        </ul>
+
+        <h2>3. User Conduct</h2>
+        <p>When interacting with our platform (comments, submissions, contact forms), you agree not to:</p>
+        <ul>
+          <li>Post defamatory, obscene, or threatening content</li>
+          <li>Impersonate any person or entity</li>
+          <li>Share misinformation or deliberately misleading content</li>
+          <li>Use automated systems to scrape or access our content</li>
+          <li>Attempt to gain unauthorized access to our systems</li>
+          <li>Interfere with the proper functioning of the website</li>
+        </ul>
+
+        <h2>4. Submissions</h2>
+        <p>By submitting content to IBC News Online (news tips, story ideas, photos, letters), you grant us a non-exclusive, worldwide, royalty-free license to use, publish, and distribute that content across our platforms.</p>
+
+        <h2>5. Disclaimer</h2>
+        <p>While we strive for accuracy in all our reporting, IBC News Online provides content on an "as is" basis. We do not warrant that all information is complete, accurate, or current. News is a developing process, and stories may be updated as new information becomes available.</p>
+        <p>Opinion articles and editorials represent the views of their respective authors and do not necessarily reflect the editorial position of IBC News Online.</p>
+
+        <h2>6. Limitation of Liability</h2>
+        <p>IBC News Online shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising from your use of or inability to use our website or services.</p>
+
+        <h2>7. Third-Party Links</h2>
+        <p>Our website may contain links to third-party websites. We are not responsible for the content, accuracy, or practices of external sites. Inclusion of a link does not imply endorsement.</p>
+
+        <h2>8. Advertising</h2>
+        <p>IBC News Online displays advertisements from third-party ad networks. We clearly distinguish advertising content from editorial content. Sponsored content and advertorials are labeled as such.</p>
+
+        <h2>9. Modifications</h2>
+        <p>We reserve the right to modify these Terms of Service at any time. Changes take effect immediately upon posting. Your continued use of the website constitutes acceptance of the modified terms.</p>
+
+        <h2>10. Governing Law</h2>
+        <p>These terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts in Mumbai, Maharashtra.</p>
+
+        <h2>11. Contact</h2>
+        <p>For questions about these Terms of Service:<br>
+        <strong>Email:</strong> support@ibcnews.online<br>
+        <strong>Address:</strong> IBC News Online, Media House, Sector 12, Navi Mumbai</p>
+      `
+    },
+    advertise: {
+      title: 'Advertise With Us',
+      content: `
+        <h2>Reach Millions of Engaged Readers</h2>
+        <p>IBC News Online offers a powerful platform to connect your brand with a diverse, engaged, and growing audience. Our readers are educated professionals, decision-makers, and active consumers who trust us for their daily news.</p>
+
+        <h2>Audience at a Glance</h2>
+        <ul>
+          <li><strong>5M+</strong> monthly page views</li>
+          <li><strong>2M+</strong> unique monthly visitors</li>
+          <li><strong>500K+</strong> newsletter subscribers</li>
+          <li><strong>1.5M+</strong> social media followers combined</li>
+          <li><strong>65%</strong> readers aged 25-54</li>
+          <li><strong>70%</strong> readers have college education or higher</li>
+        </ul>
+
+        <h2>Advertising Packages</h2>
+        <div class="ad-packages">
+          <div class="ad-card">
+            <h3>Starter</h3>
+            <div class="price">$499<span>/month</span></div>
+            <ul>
+              <li>Sidebar banner ad (300x250)</li>
+              <li>50,000 guaranteed impressions</li>
+              <li>Basic targeting (category)</li>
+              <li>Monthly performance report</li>
+              <li>1 ad creative included</li>
+            </ul>
+            <button class="btn-apply career-card" onclick="showToast('Request sent! Our ad team will contact you.')">Get Started</button>
+          </div>
+          <div class="ad-card" style="border-top-color: var(--accent);">
+            <h3>Professional</h3>
+            <div class="price">$1,499<span>/month</span></div>
+            <ul>
+              <li>Header banner ad (728x90)</li>
+              <li>In-article native ads</li>
+              <li>200,000 guaranteed impressions</li>
+              <li>Advanced targeting</li>
+              <li>Weekly performance reports</li>
+              <li>A/B testing included</li>
+            </ul>
+            <button class="btn-apply career-card" onclick="showToast('Request sent! Our ad team will contact you.')">Get Started</button>
+          </div>
+          <div class="ad-card">
+            <h3>Enterprise</h3>
+            <div class="price">Custom</div>
+            <ul>
+              <li>Homepage takeover</li>
+              <li>Sponsored content articles</li>
+              <li>Video pre-roll ads</li>
+              <li>Newsletter sponsorship</li>
+              <li>Custom integrations</li>
+              <li>Dedicated account manager</li>
+            </ul>
+            <button class="btn-apply career-card" onclick="showToast('Request sent! Our ad team will contact you.')">Contact Us</button>
+          </div>
+        </div>
+
+        <h2>Additional Options</h2>
+        <ul>
+          <li><strong>Sponsored Content</strong> — Professionally written articles that align with your brand messaging, clearly labeled as sponsored</li>
+          <li><strong>Newsletter Sponsorship</strong> — Reach our 500K+ subscribers directly in their inbox</li>
+          <li><strong>Event Sponsorship</strong> — Associate your brand with our news events, webinars, and live coverage</li>
+          <li><strong>Video Advertising</strong> — Pre-roll and mid-roll ads on our video content</li>
+        </ul>
+
+        <h2>Get in Touch</h2>
+        <p>Ready to advertise? Contact our advertising team:<br>
+        <strong>Email:</strong> <a href="mailto:support@ibcnews.online">support@ibcnews.online</a><br>
+        <strong>Phone:</strong> +91-22-4000-XXXX<br>
+        Or visit our <a href="page.html?p=contact">Contact page</a> to send a detailed inquiry.</p>
+      `
+    },
+    careers: {
+      title: 'Careers',
+      content: `
+        <h2>Join Our Team</h2>
+        <p>IBC News Online is always looking for passionate journalists, editors, developers, and media professionals who share our commitment to quality journalism. We offer a dynamic work environment, competitive compensation, and the opportunity to shape the future of digital news.</p>
+
+        <h2>Why Work With Us</h2>
+        <ul>
+          <li><strong>Impact</strong> — Your work reaches millions of readers daily</li>
+          <li><strong>Growth</strong> — Continuous learning opportunities, mentorship programs, and career advancement</li>
+          <li><strong>Flexibility</strong> — Hybrid work model with remote-friendly positions</li>
+          <li><strong>Culture</strong> — Inclusive, collaborative environment that values diverse perspectives</li>
+          <li><strong>Benefits</strong> — Competitive salary, health insurance, paid time off, and professional development budget</li>
+        </ul>
+
+        <h2>Current Openings</h2>
+        <div class="career-card">
+          <div>
+            <h3>Senior Political Correspondent</h3>
+            <div class="career-meta">Full-time &middot; Mumbai / Remote &middot; 5+ years experience</div>
+          </div>
+          <button class="btn-apply" onclick="showToast('Application portal opening soon. Email support@ibcnews.online')">Apply Now</button>
+        </div>
+        <div class="career-card">
+          <div>
+            <h3>Tech & Science Reporter</h3>
+            <div class="career-meta">Full-time &middot; Bangalore / Remote &middot; 3+ years experience</div>
+          </div>
+          <button class="btn-apply" onclick="showToast('Application portal opening soon. Email support@ibcnews.online')">Apply Now</button>
+        </div>
+        <div class="career-card">
+          <div>
+            <h3>Video Journalist / Editor</h3>
+            <div class="career-meta">Full-time &middot; Mumbai &middot; 2+ years experience</div>
+          </div>
+          <button class="btn-apply" onclick="showToast('Application portal opening soon. Email support@ibcnews.online')">Apply Now</button>
+        </div>
+        <div class="career-card">
+          <div>
+            <h3>Social Media Manager</h3>
+            <div class="career-meta">Full-time &middot; Remote &middot; 2+ years experience</div>
+          </div>
+          <button class="btn-apply" onclick="showToast('Application portal opening soon. Email support@ibcnews.online')">Apply Now</button>
+        </div>
+        <div class="career-card">
+          <div>
+            <h3>Full-Stack Developer</h3>
+            <div class="career-meta">Full-time &middot; Remote &middot; 3+ years experience</div>
+          </div>
+          <button class="btn-apply" onclick="showToast('Application portal opening soon. Email support@ibcnews.online')">Apply Now</button>
+        </div>
+        <div class="career-card">
+          <div>
+            <h3>Editorial Intern</h3>
+            <div class="career-meta">Internship (6 months) &middot; Mumbai / Remote &middot; Fresh graduates welcome</div>
+          </div>
+          <button class="btn-apply" onclick="showToast('Application portal opening soon. Email support@ibcnews.online')">Apply Now</button>
+        </div>
+
+        <h2>Don't See Your Role?</h2>
+        <p>We're always interested in hearing from talented individuals. Send your resume and a cover letter to <a href="mailto:support@ibcnews.online">support@ibcnews.online</a> and tell us how you'd contribute to IBC News Online.</p>
+      `
+    },
+    tipline: {
+      title: 'Tip Line',
+      content: `
+        <div class="tipline-box">
+          <h2>Got a News Tip?</h2>
+          <p>Help us uncover stories that matter. Your identity will be kept strictly confidential.</p>
+        </div>
+
+        <h2>How to Submit a Tip</h2>
+        <p>If you have information about a story that should be investigated or reported, we want to hear from you. We take source protection seriously and will never reveal your identity without your explicit consent.</p>
+
+        <h3>Secure Channels</h3>
+        <ul>
+          <li><strong>Email:</strong> <a href="mailto:support@ibcnews.online">support@ibcnews.online</a></li>
+          <li><strong>Phone:</strong> +91-22-4000-XXXX (ask for the investigations desk)</li>
+          <li><strong>WhatsApp:</strong> +91-XXXXX-XXXXX (end-to-end encrypted)</li>
+          <li><strong>In Person:</strong> Visit our newsroom at Media House, Sector 12, Navi Mumbai</li>
+        </ul>
+
+        <h2>What Makes a Good Tip</h2>
+        <ul>
+          <li>Be as specific as possible — names, dates, locations, documents</li>
+          <li>Provide supporting evidence if available (documents, photos, recordings)</li>
+          <li>Explain why this story matters to the public</li>
+          <li>Let us know if there's a time sensitivity</li>
+          <li>Tell us how we can verify the information independently</li>
+        </ul>
+
+        <h2>Our Commitment</h2>
+        <ul>
+          <li>We protect the identity of our sources absolutely</li>
+          <li>We verify all information independently before publication</li>
+          <li>We will contact you only through your preferred method</li>
+          <li>We follow all applicable laws regarding source protection</li>
+        </ul>
+
+        <h2>Submit Your Tip</h2>
+        <div class="contact-form">
+          <div class="form-group">
+            <label>Your Name (optional — you can remain anonymous)</label>
+            <input type="text" placeholder="Anonymous if preferred">
+          </div>
+          <div class="form-group">
+            <label>Contact Method (optional — for follow-up)</label>
+            <input type="text" placeholder="Email, phone, or other secure method">
+          </div>
+          <div class="form-group">
+            <label>Your Tip *</label>
+            <textarea placeholder="Describe the story or information you'd like to share. Be as detailed as possible."></textarea>
+          </div>
+          <button onclick="showToast('Tip submitted securely. Thank you for reaching out.')">Submit Tip Securely</button>
+        </div>
+      `
+    },
+    submit: {
+      title: 'Submit a Story',
+      content: `
+        <h2>Share Your Story With Us</h2>
+        <p>Are you a freelance journalist, citizen reporter, or eyewitness to a newsworthy event? We welcome story submissions from contributors around the world. Whether it's a local event, an investigative piece, or an opinion article — we want to hear from you.</p>
+
+        <h2>What We're Looking For</h2>
+        <ul>
+          <li><strong>Breaking News</strong> — Eyewitness accounts, first-person reports, photos and videos from the scene</li>
+          <li><strong>Investigative Pieces</strong> — Well-researched stories that uncover important issues</li>
+          <li><strong>Feature Stories</strong> — In-depth profiles, human interest stories, and long-form narratives</li>
+          <li><strong>Opinion &amp; Analysis</strong> — Expert commentary on current affairs (800-1200 words)</li>
+          <li><strong>Photo Essays</strong> — Compelling visual storytelling with captions</li>
+          <li><strong>Local News</strong> — Stories from your community that deserve wider attention</li>
+        </ul>
+
+        <h2>Submission Guidelines</h2>
+        <ul>
+          <li>All submissions must be original and not published elsewhere</li>
+          <li>Include your full name, credentials, and contact information</li>
+          <li>Articles should be between 500-2000 words</li>
+          <li>Include relevant photos (with proper credits and permissions)</li>
+          <li>Provide sources for all claims and statistics</li>
+          <li>We reserve the right to edit submissions for clarity and style</li>
+        </ul>
+
+        <h2>Compensation</h2>
+        <p>Published contributors receive compensation based on the type and length of the article. Rates are discussed upon acceptance. Regular contributors may be offered a freelance contract.</p>
+
+        <h2>Submit Your Story</h2>
+        <div class="contact-form submit-story-form">
+          <div class="form-group">
+            <label>Your Name *</label>
+            <input type="text" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label>Story Category *</label>
+            <select>
+              <option>Breaking News</option>
+              <option>Investigative</option>
+              <option>Feature Story</option>
+              <option>Opinion / Analysis</option>
+              <option>Photo Essay</option>
+              <option>Local News</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Headline *</label>
+            <input type="text" placeholder="Proposed headline for your story">
+          </div>
+          <div class="form-group">
+            <label>Story Summary *</label>
+            <textarea placeholder="Provide a brief summary (2-3 paragraphs) of your story and why it matters."></textarea>
+          </div>
+          <button onclick="showToast('Story submitted! Our editorial team will review it within 48 hours.')">Submit Story</button>
+        </div>
+      `
+    }
+  };
+
+  // Load page from URL
+  const params = new URLSearchParams(window.location.search);
+  const pageId = params.get('p') || 'about';
+  const page = PAGES[pageId];
+
+  if (page) {
+    document.getElementById('pageTitle').textContent = page.title + ' — IBC News Online';
+    document.getElementById('heroTitle').textContent = page.title;
+    document.getElementById('breadcrumbTitle').textContent = page.title;
+    document.getElementById('pageBody').innerHTML = page.content;
+  } else {
+    document.getElementById('heroTitle').textContent = 'Page Not Found';
+    document.getElementById('breadcrumbTitle').textContent = '404';
+    document.getElementById('pageBody').innerHTML = '<p>The page you are looking for does not exist. <a href="index.html">Return to homepage</a>.</p>';
+  }
+  </script>
+</body>
+</html>
