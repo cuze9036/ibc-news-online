@@ -331,6 +331,14 @@ function generateId() {
   return 'a' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 }
 
+function slugify(text) {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
+}
+
+function getArticleUrl(article) {
+  return 'article.html?id=' + encodeURIComponent(article.id) + '&slug=' + slugify(article.title);
+}
+
 function formatDate(dateStr) {
   const d = new Date(dateStr);
   const now = new Date();

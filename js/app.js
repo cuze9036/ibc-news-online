@@ -251,56 +251,9 @@ function renderFooter() {
 function openArticle(id) {
   const article = getArticleById(id);
   if (!article) return;
-
-  // Increment views
   article.views = (article.views || 0) + 1;
   saveArticle(article);
-
-  const cat = getCategories().find(c => c.id === article.category);
-  document.getElementById('articleCatBreadcrumb').textContent = cat ? cat.name : article.category;
-  document.getElementById('articleTitle').textContent = article.title;
-  document.getElementById('articleAuthor').textContent = article.author;
-  document.getElementById('articleDate').textContent = formatFullDate(article.publishedAt);
-  document.getElementById('articleViews').textContent = formatViews(article.views) + ' views';
-  document.getElementById('articleBody').innerHTML = article.content;
-
-  const tagsEl = document.getElementById('articleTags');
-  tagsEl.innerHTML = (article.tags || []).map(t => `<span class="article-tag">#${t}</span>`).join('');
-
-  // Related articles sidebar
-  const sidebar = document.getElementById('articleSidebar');
-  const related = getArticlesByCategory(article.category).filter(a => a.id !== id).slice(0, 4);
-  let sidebarHtml = '<div class="sidebar-widget"><div class="widget-header">Related News</div><div class="widget-body">';
-  related.forEach(a => {
-    sidebarHtml += `
-      <div class="trending-item" onclick="openArticle('${a.id}')">
-        <div class="trending-info">
-          <h4>${a.title}</h4>
-          <div class="meta">${formatDate(a.publishedAt)}</div>
-        </div>
-      </div>`;
-  });
-  sidebarHtml += '</div></div>';
-
-  // Trending
-  sidebarHtml += '<div class="sidebar-widget"><div class="widget-header">&#128293; Trending</div><div class="widget-body">';
-  getTrendingArticles(5).forEach((a, i) => {
-    sidebarHtml += `
-      <div class="trending-item" onclick="openArticle('${a.id}')">
-        <div class="trending-num">${String(i+1).padStart(2,'0')}</div>
-        <div class="trending-info">
-          <h4>${a.title}</h4>
-          <div class="meta">${formatViews(a.views)} views</div>
-        </div>
-      </div>`;
-  });
-  sidebarHtml += '</div></div>';
-  sidebar.innerHTML = sidebarHtml;
-
-  renderComments(id);
-
-  document.getElementById('articleOverlay').classList.add('active');
-  document.body.style.overflow = 'hidden';
+  window.location.href = getArticleUrl(article);
 }
 
 // --- Comments ---

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IBC News Online</title>
+  <meta name="description" content="">
+  <meta name="copyright" content="Copyright IBC News Online. All Rights Reserved.">
+  <meta name="author" content="IBC News Online — ibcnews.online">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23D32F2F' rx='12' width='100' height='100'/><text x='50' y='68' font-size='40' font-weight='900' fill='white' text-anchor='middle' font-family='Arial'>IBC</text></svg>">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="container">
+      <div class="top-bar-left">
+        <span id="currentDate"></span>
+        <span>|</span>
+        <span id="currentTime"></span>
+      </div>
+      <div class="top-bar-right">
+        <div class="social-links">
+          <a href="#" title="Facebook">FB</a>
+          <a href="#" title="Twitter/X">X</a>
+          <a href="#" title="YouTube">YT</a>
+          <a href="#" title="Instagram">IG</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="main-header">
+    <div class="container">
+      <div class="header-content">
+        <a href="index.html" class="logo">
+          IBC<span class="logo-highlight">NEWS</span>
+          <span class="logo-sub">Your Trusted Source</span>
+        </a>
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="Search news..." onkeyup="if(event.key==='Enter'){window.location.href='index.html?q='+encodeURIComponent(this.value)}">
+          <button onclick="window.location.href='index.html?q='+encodeURIComponent(document.getElementById('searchInput').value)">&#128269;</button>
+        </div>
+        <div class="header-actions">
+          <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">&#9790;</button>
+          <button class="hamburger" onclick="toggleMobileNav()" aria-label="Menu">&#9776;</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="main-nav" id="mainNav">
+    <div class="container">
+      <ul class="nav-list" id="navList">
+        <li><a href="index.html" class="nav-home">&#127968; Home</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Article Header Bar -->
+  <div style="background:var(--primary);padding:12px 0;">
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;">
+      <a href="index.html" style="color:#fff;font-weight:700;font-size:14px;text-decoration:none;">&#8592; Back to Home</a>
+      <span style="color:#fff;font-size:13px;font-weight:600;">IBC News Online</span>
+    </div>
+  </div>
+
+  <!-- Article Content -->
+  <div class="container">
+    <div class="article-page" style="padding-top:30px;">
+      <div class="content-grid">
+        <div>
+          <div class="article-header">
+            <div class="article-breadcrumb">
+              <a href="index.html">Home</a> / <span id="articleCatBreadcrumb"></span>
+            </div>
+            <h1 id="articleTitle"></h1>
+            <div class="article-meta-bar">
+              <span>By <strong id="articleAuthor"></strong></span>
+              <span id="articleDate"></span>
+              <span id="articleViews"></span>
+            </div>
+          </div>
+          <div class="article-body" id="articleBody"></div>
+          <div class="article-tags" id="articleTags"></div>
+          <div class="share-bar">
+            <span class="share-btn" style="background:#1877F2;" onclick="showToast('Link copied!')">Share on Facebook</span>
+            <span class="share-btn" style="background:#1DA1F2;" onclick="showToast('Link copied!')">Share on X</span>
+            <span class="share-btn" style="background:#25D366;" onclick="showToast('Link copied!')">WhatsApp</span>
+            <span class="share-btn" style="background:#555;" onclick="copyArticleLink()">Copy Link</span>
+          </div>
+
+          <!-- Comment Section -->
+          <div class="comments-section" id="commentsSection">
+            <h3 class="comments-heading">Comments <span id="commentCount" class="comment-count-badge">0</span></h3>
+            <div class="comment-form">
+              <div class="comment-avatar-wrap">
+                <div class="comment-avatar">&#128100;</div>
+              </div>
+              <div class="comment-input-wrap">
+                <input type="text" id="commentName" class="comment-name-input" placeholder="Your name">
+                <textarea id="commentText" class="comment-textarea" placeholder="Write a comment..." rows="3"></textarea>
+                <button class="comment-submit-btn" onclick="postComment()">Post Comment</button>
+              </div>
+            </div>
+            <div id="commentsList" class="comments-list"></div>
+          </div>
+        </div>
+        <aside class="sidebar" id="articleSidebar"></aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo">IBC<span class="logo-highlight">NEWS</span></div>
+          <p>IBC News Online delivers breaking news, in-depth analysis, and comprehensive coverage of national and international events. Stay informed with trusted journalism.</p>
+          <div class="footer-social">
+            <a href="#">FB</a>
+            <a href="#">X</a>
+            <a href="#">YT</a>
+            <a href="#">IG</a>
+            <a href="#">LI</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h3>Categories</h3>
+          <ul id="footerCategories"></ul>
+        </div>
+        <div class="footer-col">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="page.html?p=about">About Us</a></li>
+            <li><a href="page.html?p=contact">Contact</a></li>
+            <li><a href="page.html?p=advertise">Advertise</a></li>
+            <li><a href="page.html?p=careers">Careers</a></li>
+            <li><a href="page.html?p=privacy">Privacy Policy</a></li>
+            <li><a href="page.html?p=terms">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Contact Us</h3>
+          <ul>
+            <li style="margin-bottom:14px;line-height:1.6;font-size:13px;">
+              IBC News Online<br>
+              Media House, Sector 12<br>
+              support@ibcnews.online
+            </li>
+            <li><a href="page.html?p=tipline">Tip Line</a></li>
+            <li><a href="page.html?p=submit">Submit a Story</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        &copy; <span id="footerYear"></span> IBC News Online. All Rights Reserved. Unauthorized reproduction, distribution, or transmission of any content on this website is strictly prohibited without prior written consent. | ibcnews.online
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to Top -->
+  <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/data.js?v=5"></script>
+  <script>
+    // --- Article Page Logic ---
+    const params = new URLSearchParams(window.location.search);
+    const articleId = params.get('id');
+
+    function renderArticlePage() {
+      if (!articleId) { window.location.href = 'index.html'; return; }
+      const article = getArticleById(articleId);
+      if (!article) { window.location.href = 'index.html'; return; }
+
+      document.title = article.title + ' — IBC News Online';
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.content = article.excerpt;
+
+      const cat = getCategories().find(c => c.id === article.category);
+      document.getElementById('articleCatBreadcrumb').textContent = cat ? cat.name : article.category;
+      document.getElementById('articleTitle').textContent = article.title;
+      document.getElementById('articleAuthor').textContent = article.author;
+      document.getElementById('articleDate').textContent = formatFullDate(article.publishedAt);
+      document.getElementById('articleViews').textContent = formatViews(article.views) + ' views';
+      document.getElementById('articleBody').innerHTML = article.content;
+
+      const tagsEl = document.getElementById('articleTags');
+      tagsEl.innerHTML = (article.tags || []).map(t => `<span class="article-tag">#${t}</span>`).join('');
+
+      // Related articles sidebar
+      const sidebar = document.getElementById('articleSidebar');
+      const related = getArticlesByCategory(article.category).filter(a => a.id !== articleId).slice(0, 4);
+      let sidebarHtml = '<div class="sidebar-widget"><div class="widget-header">Related News</div><div class="widget-body">';
+      related.forEach(a => {
+        sidebarHtml += `
+          <div class="trending-item" onclick="goToArticle('${a.id}')" style="cursor:pointer;">
+            <div class="trending-info">
+              <h4>${a.title}</h4>
+              <div class="meta">${formatDate(a.publishedAt)}</div>
+            </div>
+          </div>`;
+      });
+      sidebarHtml += '</div></div>';
+
+      // Trending
+      sidebarHtml += '<div class="sidebar-widget"><div class="widget-header">&#128293; Trending</div><div class="widget-body">';
+      getTrendingArticles(5).forEach((a, i) => {
+        sidebarHtml += `
+          <div class="trending-item" onclick="goToArticle('${a.id}')" style="cursor:pointer;">
+            <div class="trending-num">${String(i+1).padStart(2,'0')}</div>
+            <div class="trending-info">
+              <h4>${a.title}</h4>
+              <div class="meta">${formatViews(a.views)} views</div>
+            </div>
+          </div>`;
+      });
+      sidebarHtml += '</div></div>';
+      sidebar.innerHTML = sidebarHtml;
+
+      renderComments(articleId);
+
+      // Nav categories
+      const navList = document.getElementById('navList');
+      getCategories().forEach(c => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="index.html#cat-${c.slug}">${c.name}</a>`;
+        navList.appendChild(li);
+      });
+
+      // Footer categories
+      const fc = document.getElementById('footerCategories');
+      if (fc) {
+        fc.innerHTML = getCategories().slice(0, 8).map(c =>
+          `<li><a href="index.html#cat-${c.slug}">${c.name}</a></li>`
+        ).join('');
+      }
+
+      // Footer year
+      const fy = document.getElementById('footerYear');
+      if (fy) fy.textContent = new Date().getFullYear();
+    }
+
+    function goToArticle(id) {
+      const a = getArticleById(id);
+      if (!a) return;
+      a.views = (a.views || 0) + 1;
+      saveArticle(a);
+      window.location.href = getArticleUrl(a);
+    }
+
+    function copyArticleLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => showToast('Link copied to clipboard!'));
+    }
+
+    // --- Comments ---
+    const COMMENTS_KEY = 'ibc_news_comments';
+    let currentArticleId = articleId;
+
+    function getComments(aid) {
+      try {
+        const all = JSON.parse(localStorage.getItem(COMMENTS_KEY) || '{}');
+        return all[aid] || [];
+      } catch { return []; }
+    }
+
+    function saveComment(aid, comment) {
+      try {
+        const all = JSON.parse(localStorage.getItem(COMMENTS_KEY) || '{}');
+        if (!all[aid]) all[aid] = [];
+        all[aid].unshift(comment);
+        localStorage.setItem(COMMENTS_KEY, JSON.stringify(all));
+      } catch {}
+    }
+
+    function deleteComment(aid, commentId) {
+      try {
+        const all = JSON.parse(localStorage.getItem(COMMENTS_KEY) || '{}');
+        if (all[aid]) {
+          all[aid] = all[aid].filter(c => c.id !== commentId);
+          localStorage.setItem(COMMENTS_KEY, JSON.stringify(all));
+        }
+      } catch {}
+    }
+
+    function renderComments(aid) {
+      currentArticleId = aid;
+      const comments = getComments(aid);
+      document.getElementById('commentCount').textContent = comments.length;
+      const list = document.getElementById('commentsList');
+      if (comments.length === 0) {
+        list.innerHTML = '<div class="no-comments">No comments yet. Be the first to comment!</div>';
+        return;
+      }
+      list.innerHTML = comments.map(c => {
+        const initials = (c.name || 'A').slice(0, 2).toUpperCase();
+        const timeAgo = getTimeAgo(c.time);
+        return `<div class="comment-item">
+          <div class="comment-user-avatar">${initials}</div>
+          <div class="comment-body">
+            <span class="comment-user-name">${escapeHtml(c.name)}</span>
+            <span class="comment-time">${timeAgo}</span>
+            <div class="comment-text">${escapeHtml(c.text)}</div>
+            <div class="comment-actions">
+              <button class="comment-action-btn" onclick="likeComment('${aid}','${c.id}')">&#9825; ${c.likes || 0}</button>
+              <button class="comment-action-btn" onclick="replyToComment('${escapeHtml(c.name)}')">Reply</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function postComment() {
+      const name = document.getElementById('commentName').value.trim();
+      const text = document.getElementById('commentText').value.trim();
+      if (!name || !text) { showToast('Please enter your name and comment.'); return; }
+      const comment = {
+        id: 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        name: name, text: text, time: new Date().toISOString(), likes: 0
+      };
+      saveComment(currentArticleId, comment);
+      document.getElementById('commentText').value = '';
+      renderComments(currentArticleId);
+      showToast('Comment posted!');
+    }
+
+    function likeComment(aid, commentId) {
+      try {
+        const all = JSON.parse(localStorage.getItem(COMMENTS_KEY) || '{}');
+        const c = (all[aid] || []).find(c => c.id === commentId);
+        if (c) { c.likes = (c.likes || 0) + 1; localStorage.setItem(COMMENTS_KEY, JSON.stringify(all)); renderComments(aid); }
+      } catch {}
+    }
+
+    function replyToComment(name) {
+      document.getElementById('commentText').value = `@${name} `;
+      document.getElementById('commentText').focus();
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function getTimeAgo(dateStr) {
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'Just now';
+      if (mins < 60) return mins + ' min ago';
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return hrs + ' hour' + (hrs > 1 ? 's' : '') + ' ago';
+      const days = Math.floor(hrs / 24);
+      if (days < 30) return days + ' day' + (days > 1 ? 's' : '') + ' ago';
+      return new Date(dateStr).toLocaleDateString();
+    }
+
+    // --- Theme ---
+    function initTheme() {
+      try {
+        const saved = localStorage.getItem('ibc_theme');
+        if (saved) {
+          document.documentElement.setAttribute('data-theme', saved);
+          updateThemeIcon(saved);
+        }
+      } catch {}
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('ibc_theme', next); } catch {}
+      updateThemeIcon(next);
+    }
+
+    function updateThemeIcon(theme) {
+      const btn = document.getElementById('themeToggle');
+      if (btn) btn.innerHTML = theme === 'dark' ? '&#9728;' : '&#9790;';
+    }
+
+    function toggleMobileNav() {
+      document.getElementById('mainNav').classList.toggle('open');
+    }
+
+    // --- Helpers ---
+    function formatViews(n) {
+      if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+      if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+      return String(n);
+    }
+
+    // --- Toast ---
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // --- Date/Time ---
+    function updateDateTime() {
+      const now = new Date();
+      const dateEl = document.getElementById('currentDate');
+      const timeEl = document.getElementById('currentTime');
+      if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      if (timeEl) timeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // --- Back to Top ---
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('backToTop');
+      if (btn) btn.classList.toggle('visible', window.scrollY > 400);
+    });
+
+    // --- Init ---
+    initTheme();
+    updateDateTime();
+    setInterval(updateDateTime, 30000);
+    renderArticlePage();
+  </script>
+</body>
+</html>
