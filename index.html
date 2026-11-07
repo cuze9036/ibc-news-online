@@ -226,7 +226,7 @@
   <div class="video-modal-overlay" id="videoModal" onclick="closeVideoModal()">
     <div class="video-modal" onclick="event.stopPropagation()">
       <button class="video-modal-close" onclick="closeVideoModal()">&times;</button>
-      <iframe id="videoFrame" src="" allowfullscreen></iframe>
+      <video id="videoPlayer" controls playsinline preload="metadata" style="width:100%;border-radius:8px;background:#000;"></video>
     </div>
   </div>
 
@@ -308,8 +308,8 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <script src="js/data.js"></script>
-  <script src="js/aggregator.js?v=3"></script>
-  <script src="js/app.js"></script>
+  <script src="js/data.js?v=4"></script>
+  <script src="js/aggregator.js?v=4"></script>
+  <script src="js/app.js?v=4"></script>
 </body>
 </html>

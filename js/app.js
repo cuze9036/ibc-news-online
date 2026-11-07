@@ -164,7 +164,7 @@ function renderVideoSection() {
   if (videos.length === 0) return;
   section.style.display = 'block';
   grid.innerHTML = videos.map(a => `
-    <div class="video-card" onclick="playVideo('${a.videoUrl}')">
+    <div class="video-card" onclick="openArticle('${a.id}')"
       <div class="video-thumb">
         <div class="play-icon">&#9654;</div>
       </div>
@@ -526,16 +526,18 @@ function showAllNews(e) {
 // --- Video ---
 function playVideo(url) {
   const modal = document.getElementById('videoModal');
-  const frame = document.getElementById('videoFrame');
-  frame.src = url;
+  const player = document.getElementById('videoPlayer');
+  player.src = url;
+  player.play();
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
 }
 
 function closeVideoModal() {
   const modal = document.getElementById('videoModal');
-  const frame = document.getElementById('videoFrame');
-  frame.src = '';
+  const player = document.getElementById('videoPlayer');
+  player.pause();
+  player.src = '';
   modal.classList.remove('active');
   document.body.style.overflow = '';
 }
