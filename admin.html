@@ -51,7 +51,10 @@
         <div class="admin-table-wrap">
           <div class="admin-table-header">
             <h2>Recent Articles</h2>
-            <button class="btn-new" onclick="showView('create', null)">&#10133; New Article</button>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <input type="text" id="dashSearchInput" placeholder="Search articles..." onkeyup="filterDashboardArticles()" style="padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:13px;width:220px;">
+              <button class="btn-new" onclick="showView('create', null)">&#10133; New Article</button>
+            </div>
           </div>
           <table class="admin-table">
             <thead>
@@ -75,7 +78,13 @@
         <div class="admin-table-wrap">
           <div class="admin-table-header">
             <h2>All Articles (<span id="articleCount"></span>)</h2>
-            <button class="btn-new" onclick="showView('create', null)">&#10133; New Article</button>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <input type="text" id="artSearchInput" placeholder="Search articles..." onkeyup="filterAllArticles()" style="padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:13px;width:220px;">
+              <select id="artCategoryFilter" onchange="filterAllArticles()" style="padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:13px;">
+                <option value="">All Categories</option>
+              </select>
+              <button class="btn-new" onclick="showView('create', null)">&#10133; New Article</button>
+            </div>
           </div>
           <table class="admin-table">
             <thead>
@@ -312,8 +321,8 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <script src="js/data.js"></script>
-  <script src="js/aggregator.js"></script>
-  <script src="js/admin.js"></script>
+  <script src="js/data.js?v=5"></script>
+  <script src="js/aggregator.js?v=5"></script>
+  <script src="js/admin.js?v=5"></script>
 </body>
 </html>

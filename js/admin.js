@@ -110,6 +110,43 @@ function renderAllArticles() {
   const articles = getAllArticles().sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
   document.getElementById('articleCount').textContent = articles.length;
   document.getElementById('allTableBody').innerHTML = articles.map(a => articleRow(a)).join('');
+  const catFilter = document.getElementById('artCategoryFilter');
+  if (catFilter && catFilter.options.length <= 1) {
+    getCategories().forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.name;
+      catFilter.appendChild(opt);
+    });
+  }
+}
+
+function filterAllArticles() {
+  const q = (document.getElementById('artSearchInput').value || '').trim().toLowerCase();
+  const cat = (document.getElementById('artCategoryFilter').value || '');
+  let articles = getAllArticles().sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+  if (cat) articles = articles.filter(a => a.category === cat);
+  if (q) articles = articles.filter(a =>
+    a.title.toLowerCase().includes(q) ||
+    a.author.toLowerCase().includes(q) ||
+    (a.tags || []).some(t => t.toLowerCase().includes(q)) ||
+    a.category.toLowerCase().includes(q) ||
+    a.excerpt.toLowerCase().includes(q)
+  );
+  document.getElementById('articleCount').textContent = articles.length;
+  document.getElementById('allTableBody').innerHTML = articles.map(a => articleRow(a)).join('');
+}
+
+function filterDashboardArticles() {
+  const q = (document.getElementById('dashSearchInput').value || '').trim().toLowerCase();
+  let articles = getLatestArticles(100);
+  if (q) articles = articles.filter(a =>
+    a.title.toLowerCase().includes(q) ||
+    a.author.toLowerCase().includes(q) ||
+    (a.tags || []).some(t => t.toLowerCase().includes(q)) ||
+    a.category.toLowerCase().includes(q)
+  );
+  document.getElementById('recentTableBody').innerHTML = articles.slice(0, 20).map(a => articleRow(a)).join('');
 }
 
 function articleRow(a) {
