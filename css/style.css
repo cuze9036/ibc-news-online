@@ -1124,6 +1124,26 @@ ul, ol { list-style: none; }
   cursor: pointer;
 }
 
+/* ===== VIDEO WATERMARK ===== */
+.video-player-wrap {
+  position: relative;
+}
+.video-watermark {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.35);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  user-select: none;
+  z-index: 5;
+  font-family: Arial, Helvetica, sans-serif;
+  text-transform: uppercase;
+}
+
 /* ===== BACK TO TOP ===== */
 .back-to-top {
   position: fixed;
