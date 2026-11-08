@@ -193,6 +193,7 @@ function clearEditor() {
 function editArticle(id) {
   const a = getArticleById(id);
   if (!a) return;
+  showView('create', null);
   document.getElementById('editId').value = a.id;
   document.getElementById('artTitle').value = a.title;
   document.getElementById('artCategory').value = a.category;
@@ -206,7 +207,7 @@ function editArticle(id) {
   document.getElementById('artBreaking').checked = a.breaking;
   document.getElementById('artDate').value = a.publishedAt ? new Date(a.publishedAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16);
   document.getElementById('editorTitle').textContent = 'Edit Article';
-  showView('create', null);
+  document.getElementById('viewTitle').textContent = 'Edit Article';
 }
 
 function saveArticleForm() {
