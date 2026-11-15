@@ -100,14 +100,17 @@
     </div>
   </div>
 
-  <!-- Image -->
+  <!-- Thumbnail / Image -->
   <div class="card">
-    <h2>&#128247; Image (optional)</h2>
+    <h2>&#128247; Thumbnail <span style="font-size:13px;color:#888;font-weight:400;">(upload or auto-grab from video)</span></h2>
     <div class="file-box" id="imgBox">
       <input type="file" id="imgFile" accept="image/*" onchange="previewFile(this,'img')">
       <div class="icon">&#128247;</div>
-      <p>Click or drag an image here</p>
+      <p>Click or drag a thumbnail image here</p>
       <div class="name" id="imgName"></div>
+    </div>
+    <div style="margin:10px 0;text-align:center;">
+      <button type="button" onclick="grabVideoThumbPost()" style="background:#1976d2;color:#fff;border:none;padding:8px 20px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Grab Thumbnail from Video</button>
     </div>
     <div class="folder-row">
       <label style="margin:0;white-space:nowrap">Save to folder:</label>
@@ -224,6 +227,46 @@ async function aiGenerate() {
   btn.textContent = '✨ AI Generate from Title';
 }
 
+let pendingThumbDataUrl = null;
+
+function grabVideoThumbPost() {
+  const vid = document.getElementById('vidPreviewEl');
+  if (!vid || !vid.src || vid.readyState < 2) {
+    showMsg('Pick a video file first', true);
+    return;
+  }
+  const c = document.createElement('canvas');
+  c.width = vid.videoWidth || 640;
+  c.height = vid.videoHeight || 360;
+  c.getContext('2d').drawImage(vid, 0, 0, c.width, c.height);
+  pendingThumbDataUrl = c.toDataURL('image/jpeg', 0.85);
+  document.getElementById('imgPreviewEl').src = pendingThumbDataUrl;
+  document.getElementById('imgPreview').style.display = 'block';
+  document.getElementById('imgName').textContent = 'video-thumbnail.jpg';
+  showMsg('Thumbnail grabbed from video!');
+}
+
+function autoExtractThumbFromVideo(videoFile) {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(videoFile);
+    const vid = document.createElement('video');
+    vid.muted = true;
+    vid.preload = 'auto';
+    vid.onloadeddata = function() { vid.currentTime = 0.1; };
+    vid.onseeked = function() {
+      const c = document.createElement('canvas');
+      c.width = vid.videoWidth || 640;
+      c.height = vid.videoHeight || 360;
+      c.getContext('2d').drawImage(vid, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', 0.85));
+    };
+    vid.onerror = function() { URL.revokeObjectURL(url); resolve(null); };
+    setTimeout(() => resolve(null), 5000);
+    vid.src = url;
+  });
+}
+
 // File preview
 let selectedImg = null;
 let selectedVid = null;
@@ -288,7 +331,16 @@ async function publishPost() {
   }
 
   const imgFolder = document.getElementById('imgFolder').value;
-  const imgPath = selectedImg ? imgFolder + selectedImg.name : '';
+  let imgPath = '';
+  if (pendingThumbDataUrl) {
+    imgPath = pendingThumbDataUrl;
+    pendingThumbDataUrl = null;
+  } else if (selectedImg) {
+    imgPath = imgFolder + selectedImg.name;
+  } else if (selectedVid) {
+    const extracted = await autoExtractThumbFromVideo(selectedVid);
+    if (extracted) imgPath = extracted;
+  }
 
   // Build HTML content
   let html = '';

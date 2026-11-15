@@ -188,6 +188,11 @@ function clearEditor() {
   document.getElementById('artVideo').value = '';
   document.getElementById('artTags').value = '';
   document.getElementById('artViews').value = '';
+  pendingThumbDataUrl = null;
+  const tp = document.getElementById('thumbPreview');
+  if (tp) { tp.src = ''; document.getElementById('thumbPreviewWrap').style.display = 'none'; }
+  const tf = document.getElementById('artThumbFile');
+  if (tf) tf.value = '';
   document.getElementById('artFeatured').checked = false;
   document.getElementById('artBreaking').checked = false;
   document.getElementById('artDate').value = new Date().toISOString().slice(0, 16);
@@ -244,7 +249,16 @@ async function saveArticleForm() {
   }
 
   const videoUrl = document.getElementById('artVideo').value.trim();
-  const imgUrl = document.getElementById('artImage').value.trim();
+  let imgUrl = document.getElementById('artImage').value.trim();
+
+  // Thumbnail: manual upload > URL > auto-extract from video
+  if (pendingThumbDataUrl) {
+    imgUrl = pendingThumbDataUrl;
+    pendingThumbDataUrl = null;
+  } else if (!imgUrl && pendingVideoFile) {
+    const extracted = await autoExtractThumbFromVideo(pendingVideoFile);
+    if (extracted) imgUrl = extracted;
+  }
 
   // Auto-build video player + image into content (skip idb: videos — rendered by article.html)
   let fullContent = '';
@@ -389,6 +403,63 @@ async function aiGenerateContent() {
 
   btn.disabled = false;
   btn.textContent = '✨ AI Generate from Title';
+}
+
+// --- Thumbnail from Video ---
+let pendingThumbDataUrl = null;
+
+function handleThumbFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    pendingThumbDataUrl = e.target.result;
+    document.getElementById('thumbPreview').src = pendingThumbDataUrl;
+    document.getElementById('thumbPreviewWrap').style.display = 'block';
+    document.getElementById('artImage').value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function grabVideoThumb() {
+  const vid = document.getElementById('videoPreview');
+  if (!vid || !vid.src || vid.readyState < 2) {
+    showToast('Pick a video file first — need a loaded video to grab frame');
+    return;
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = vid.videoWidth || 640;
+  canvas.height = vid.videoHeight || 360;
+  canvas.getContext('2d').drawImage(vid, 0, 0, canvas.width, canvas.height);
+  pendingThumbDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  document.getElementById('thumbPreview').src = pendingThumbDataUrl;
+  document.getElementById('thumbPreviewWrap').style.display = 'block';
+  document.getElementById('artImage').value = '';
+  showToast('Thumbnail grabbed from video!');
+}
+
+function autoExtractThumbFromVideo(videoFile) {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(videoFile);
+    const vid = document.createElement('video');
+    vid.muted = true;
+    vid.preload = 'auto';
+    vid.onloadeddata = function() {
+      vid.currentTime = 0.1;
+    };
+    vid.onseeked = function() {
+      const c = document.createElement('canvas');
+      c.width = vid.videoWidth || 640;
+      c.height = vid.videoHeight || 360;
+      c.getContext('2d').drawImage(vid, 0, 0, c.width, c.height);
+      const dataUrl = c.toDataURL('image/jpeg', 0.85);
+      URL.revokeObjectURL(url);
+      resolve(dataUrl);
+    };
+    vid.onerror = function() { URL.revokeObjectURL(url); resolve(null); };
+    setTimeout(() => resolve(null), 5000);
+    vid.src = url;
+  });
 }
 
 // --- Video File Upload ---
