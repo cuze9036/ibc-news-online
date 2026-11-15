@@ -160,6 +160,16 @@
               <input type="datetime-local" id="artDate">
             </div>
           </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Views Count <span style="font-size:11px;color:#888;font-weight:400;">(set fake views)</span></label>
+              <div style="display:flex;gap:8px;">
+                <input type="number" id="artViews" placeholder="0" min="0" style="flex:1;">
+                <button type="button" class="btn-new" onclick="boostViewsQuick()" style="font-size:12px;padding:6px 14px;white-space:nowrap;">+1K Views</button>
+                <button type="button" class="btn-new" onclick="boostViewsQuick(10000)" style="font-size:12px;padding:6px 14px;white-space:nowrap;">+10K</button>
+              </div>
+            </div>
+          </div>
           <div class="form-group" style="margin-bottom:20px;">
             <div class="checkbox-group">
               <label><input type="checkbox" id="artFeatured"> Featured Article</label>
@@ -331,6 +341,6 @@
 
   <script src="js/data.js?v=7"></script>
   <script src="js/aggregator.js?v=5"></script>
-  <script src="js/admin.js?v=13"></script>
+  <script src="js/admin.js?v=14"></script>
 </body>
 </html>

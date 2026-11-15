@@ -162,6 +162,8 @@ function articleRow(a) {
     <td>${formatViewsAdmin(a.views || 0)}</td>
     <td>${status}</td>
     <td class="action-btns">
+      <button class="action-btn" onclick="boostArticleViews('${a.id}', 1000)" title="+1K views" style="font-size:11px;">+1K</button>
+      <button class="action-btn" onclick="boostArticleViews('${a.id}', 10000)" title="+10K views" style="font-size:11px;">+10K</button>
       <button class="action-btn" onclick="editArticle('${a.id}')">Edit</button>
       <button class="action-btn delete" onclick="confirmDelete('${a.id}')">Delete</button>
     </td>
@@ -185,6 +187,7 @@ function clearEditor() {
   document.getElementById('artImage').value = '';
   document.getElementById('artVideo').value = '';
   document.getElementById('artTags').value = '';
+  document.getElementById('artViews').value = '';
   document.getElementById('artFeatured').checked = false;
   document.getElementById('artBreaking').checked = false;
   document.getElementById('artDate').value = new Date().toISOString().slice(0, 16);
@@ -210,6 +213,7 @@ function editArticle(id) {
   document.getElementById('artImage').value = a.image || '';
   document.getElementById('artVideo').value = a.videoUrl || '';
   document.getElementById('artTags').value = (a.tags || []).join(', ');
+  document.getElementById('artViews').value = a.views || 0;
   document.getElementById('artFeatured').checked = a.featured;
   document.getElementById('artBreaking').checked = a.breaking;
   document.getElementById('artDate').value = a.publishedAt ? new Date(a.publishedAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16);
@@ -270,13 +274,27 @@ function saveArticleForm() {
     featured: document.getElementById('artFeatured').checked,
     breaking: document.getElementById('artBreaking').checked,
     publishedAt: document.getElementById('artDate').value ? new Date(document.getElementById('artDate').value).toISOString() : (existing ? existing.publishedAt : new Date().toISOString()),
-    views: existing ? existing.views : 0
+    views: parseInt(document.getElementById('artViews').value) || (existing ? existing.views : 0)
   };
 
   saveArticle(article);
   showToast(editId ? 'Article updated!' : 'Article published!');
   showView('articles', null);
   renderAllArticles();
+}
+
+function boostViewsQuick(amount) {
+  const el = document.getElementById('artViews');
+  el.value = (parseInt(el.value) || 0) + (amount || 1000);
+}
+
+function boostArticleViews(id, amount) {
+  const a = getArticleById(id);
+  if (!a) return;
+  a.views = (a.views || 0) + (amount || 1000);
+  saveArticle(a);
+  renderAllArticles();
+  showToast('+' + (amount || 1000) + ' views added!');
 }
 
 function confirmDelete(id) {
