@@ -381,12 +381,21 @@ async function aiGenerateContent() {
 function handleVideoFileSelect(input) {
   const file = input.files[0];
   if (!file) return;
+  if (file.size > 15 * 1024 * 1024) {
+    showToast('Video 15MB se chhota hona chahiye — ya YouTube URL use karo.');
+    input.value = '';
+    return;
+  }
   const preview = document.getElementById('videoPreview');
   const wrap = document.getElementById('videoPreviewWrap');
   const url = URL.createObjectURL(file);
   preview.src = url;
   wrap.style.display = 'block';
-  document.getElementById('artVideo').value = 'videos/' + file.name;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('artVideo').value = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 function clearVideoFile() {

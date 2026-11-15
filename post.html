@@ -228,10 +228,27 @@ async function aiGenerate() {
 let selectedImg = null;
 let selectedVid = null;
 
+let imgDataUrl = '';
+let vidDataUrl = '';
+
 function previewFile(input, type) {
   const file = input.files[0];
   if (!file) return;
+  if (file.size > 15 * 1024 * 1024) {
+    showMsg('File 15MB se chhota hona chahiye — ya external URL use karo.', true);
+    input.value = '';
+    return;
+  }
   const url = URL.createObjectURL(file);
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    if (type === 'img') {
+      imgDataUrl = e.target.result;
+    } else {
+      vidDataUrl = e.target.result;
+    }
+  };
+  reader.readAsDataURL(file);
   if (type === 'img') {
     selectedImg = file;
     document.getElementById('imgName').textContent = file.name;
@@ -276,11 +293,9 @@ function publishPost() {
   if (!title) { showMsg('Title is required', true); return; }
   if (!content) { showMsg('Content is required', true); return; }
 
-  const imgFolder = document.getElementById('imgFolder').value;
-  const vidFolder = document.getElementById('vidFolder').value;
-  const imgPath = selectedImg ? imgFolder + selectedImg.name : '';
   const vidUrl = document.getElementById('vidUrl').value.trim();
-  const vidPath = selectedVid ? vidFolder + selectedVid.name : vidUrl;
+  const imgPath = imgDataUrl || '';
+  const vidPath = vidDataUrl || vidUrl;
 
   // Build HTML content
   let html = '';
@@ -324,10 +339,7 @@ function publishPost() {
 
   const url = getArticleUrl(article);
   document.getElementById('resultLink').href = url;
-  const notes = [];
-  if (selectedImg) notes.push('Put ' + selectedImg.name + ' in your repo\'s ' + imgFolder + ' folder');
-  if (selectedVid) notes.push('Put ' + selectedVid.name + ' in your repo\'s ' + vidFolder + ' folder');
-  document.getElementById('resultNote').textContent = notes.join(' | ');
+  document.getElementById('resultNote').textContent = 'Video aur image article mein embed ho gayi hai.';
   document.getElementById('resultBox').style.display = 'block';
 
   document.getElementById('publishBtn').disabled = true;
