@@ -182,7 +182,7 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <script src="js/data.js?v=7"></script>
+  <script src="js/data.js?v=8"></script>
   <script>
     // --- Article Page Logic ---
     const params = new URLSearchParams(window.location.search);
@@ -204,15 +204,28 @@
       document.getElementById('articleDate').textContent = formatFullDate(article.publishedAt);
       document.getElementById('articleViews').textContent = formatViews(article.views) + ' views';
       let bodyHtml = '';
+      let idbVideoId = null;
       if (article.videoUrl && !article.content.includes('<video')) {
         if (article.videoUrl.includes('youtube.com') || article.videoUrl.includes('youtu.be')) {
           bodyHtml += `<div style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);aspect-ratio:16/9;"><iframe src="${article.videoUrl}" style="width:100%;height:100%;border:none;" allowfullscreen></iframe></div>`;
+        } else if (article.videoUrl.startsWith('idb:')) {
+          idbVideoId = article.videoUrl.slice(4);
+          bodyHtml += `<div class="video-player-wrap" style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);"><video id="idbVideo" controls playsinline preload="metadata" style="width:100%;display:block;border-radius:10px;"></video><div class="video-watermark">IBC NEWS</div></div>`;
         } else {
           bodyHtml += `<div class="video-player-wrap" style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);"><video controls playsinline preload="metadata" style="width:100%;display:block;border-radius:10px;"><source src="${article.videoUrl}" type="video/mp4">Your browser does not support video.</video><div class="video-watermark">IBC NEWS</div></div>`;
         }
       }
       bodyHtml += article.content;
       document.getElementById('articleBody').innerHTML = bodyHtml;
+
+      if (idbVideoId) {
+        getVideoBlob(idbVideoId).then(blob => {
+          const vid = document.getElementById('idbVideo');
+          if (blob && vid) {
+            vid.src = URL.createObjectURL(blob instanceof Blob ? blob : new Blob([blob], {type: 'video/mp4'}));
+          }
+        });
+      }
 
       const tagsEl = document.getElementById('articleTags');
       tagsEl.innerHTML = (article.tags || []).map(t => `<span class="article-tag">#${t}</span>`).join('');

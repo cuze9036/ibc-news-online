@@ -221,7 +221,7 @@ function editArticle(id) {
   document.getElementById('viewTitle').textContent = 'Edit Article';
 }
 
-function saveArticleForm() {
+async function saveArticleForm() {
   const title = document.getElementById('artTitle').value.trim();
   const category = document.getElementById('artCategory').value;
   const author = document.getElementById('artAuthor').value.trim();
@@ -246,13 +246,14 @@ function saveArticleForm() {
   const videoUrl = document.getElementById('artVideo').value.trim();
   const imgUrl = document.getElementById('artImage').value.trim();
 
-  // Auto-build video player + image into content
+  // Auto-build video player + image into content (skip idb: videos — rendered by article.html)
   let fullContent = '';
-  if (videoUrl && !htmlContent.includes('<video') && !htmlContent.includes('<iframe')) {
-    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-      fullContent += `<div style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);aspect-ratio:16/9;"><iframe src="${videoUrl}" style="width:100%;height:100%;border:none;" allowfullscreen></iframe></div>`;
+  const effectiveVideoUrl = pendingVideoFile ? '' : videoUrl;
+  if (effectiveVideoUrl && !effectiveVideoUrl.startsWith('idb:') && !htmlContent.includes('<video') && !htmlContent.includes('<iframe')) {
+    if (effectiveVideoUrl.includes('youtube.com') || effectiveVideoUrl.includes('youtu.be')) {
+      fullContent += `<div style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);aspect-ratio:16/9;"><iframe src="${effectiveVideoUrl}" style="width:100%;height:100%;border:none;" allowfullscreen></iframe></div>`;
     } else {
-      fullContent += `<div class="video-player-wrap" style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);"><video controls playsinline preload="metadata" style="width:100%;display:block;border-radius:10px;"><source src="${videoUrl}" type="video/mp4">Your browser does not support video.</video><div class="video-watermark">IBC NEWS</div></div>`;
+      fullContent += `<div class="video-player-wrap" style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);"><video controls playsinline preload="metadata" style="width:100%;display:block;border-radius:10px;"><source src="${effectiveVideoUrl}" type="video/mp4">Your browser does not support video.</video><div class="video-watermark">IBC NEWS</div></div>`;
     }
     fullContent += `<div style="text-align:center;padding:10px 0 18px;"><span style="color:#fff;font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px;letter-spacing:0.3px;">This content is published by ${author || 'IBC News Desk'}</span></div>`;
   }
@@ -261,15 +262,28 @@ function saveArticleForm() {
   }
   fullContent += htmlContent;
 
+  const articleId = editId || generateId();
+
+  let finalVideoUrl = videoUrl;
+  if (pendingVideoFile) {
+    finalVideoUrl = 'idb:' + articleId;
+    await saveVideoBlob(articleId, pendingVideoFile);
+    pendingVideoFile = null;
+  } else if (videoUrl && videoUrl.startsWith('idb:') && videoUrl !== 'idb:pending') {
+    finalVideoUrl = videoUrl;
+  } else if (videoUrl === 'idb:pending') {
+    finalVideoUrl = '';
+  }
+
   const article = {
-    id: editId || generateId(),
+    id: articleId,
     title,
     category,
     author: author || 'IBC News Desk',
     excerpt,
     content: fullContent,
     image: imgUrl,
-    videoUrl: videoUrl,
+    videoUrl: finalVideoUrl,
     tags: document.getElementById('artTags').value.split(',').map(t => t.trim()).filter(Boolean),
     featured: document.getElementById('artFeatured').checked,
     breaking: document.getElementById('artBreaking').checked,
@@ -378,29 +392,24 @@ async function aiGenerateContent() {
 }
 
 // --- Video File Upload ---
+let pendingVideoFile = null;
+
 function handleVideoFileSelect(input) {
   const file = input.files[0];
   if (!file) return;
-  if (file.size > 15 * 1024 * 1024) {
-    showToast('Video 15MB se chhota hona chahiye — ya YouTube URL use karo.');
-    input.value = '';
-    return;
-  }
+  pendingVideoFile = file;
   const preview = document.getElementById('videoPreview');
   const wrap = document.getElementById('videoPreviewWrap');
-  const url = URL.createObjectURL(file);
-  preview.src = url;
+  preview.src = URL.createObjectURL(file);
   wrap.style.display = 'block';
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    document.getElementById('artVideo').value = e.target.result;
-  };
-  reader.readAsDataURL(file);
+  document.getElementById('artVideo').value = 'idb:pending';
 }
 
 function clearVideoFile() {
+  pendingVideoFile = null;
   const input = document.getElementById('artVideoFile');
   input.value = '';
+  document.getElementById('artVideo').value = '';
   document.getElementById('videoPreview').src = '';
   document.getElementById('videoPreviewWrap').style.display = 'none';
 }

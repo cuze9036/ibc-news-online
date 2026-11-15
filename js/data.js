@@ -338,6 +338,46 @@ function generateId() {
   return 'a' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 }
 
+// --- IndexedDB Video Storage ---
+function openVideoDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('ibc_videos', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('videos');
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function saveVideoBlob(articleId, blob) {
+  const db = await openVideoDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('videos', 'readwrite');
+    tx.objectStore('videos').put(blob, articleId);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function getVideoBlob(articleId) {
+  try {
+    const db = await openVideoDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction('videos', 'readonly');
+      const req = tx.objectStore('videos').get(articleId);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    });
+  } catch { return null; }
+}
+
+async function deleteVideoBlob(articleId) {
+  try {
+    const db = await openVideoDB();
+    const tx = db.transaction('videos', 'readwrite');
+    tx.objectStore('videos').delete(articleId);
+  } catch {}
+}
+
 function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
 }

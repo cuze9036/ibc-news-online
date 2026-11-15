@@ -164,7 +164,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/data.js?v=7"></script>
+<script src="js/data.js?v=8"></script>
 <script>
 // Init
 document.addEventListener('DOMContentLoaded', () => {
@@ -228,27 +228,10 @@ async function aiGenerate() {
 let selectedImg = null;
 let selectedVid = null;
 
-let imgDataUrl = '';
-let vidDataUrl = '';
-
 function previewFile(input, type) {
   const file = input.files[0];
   if (!file) return;
-  if (file.size > 15 * 1024 * 1024) {
-    showMsg('File 15MB se chhota hona chahiye — ya external URL use karo.', true);
-    input.value = '';
-    return;
-  }
   const url = URL.createObjectURL(file);
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    if (type === 'img') {
-      imgDataUrl = e.target.result;
-    } else {
-      vidDataUrl = e.target.result;
-    }
-  };
-  reader.readAsDataURL(file);
   if (type === 'img') {
     selectedImg = file;
     document.getElementById('imgName').textContent = file.name;
@@ -285,7 +268,7 @@ function textToHtml(text) {
 }
 
 // Publish
-function publishPost() {
+async function publishPost() {
   const title = document.getElementById('postTitle').value.trim();
   const content = document.getElementById('postContent').value.trim();
   const author = document.getElementById('postAuthor').value.trim() || 'IBC News Desk';
@@ -294,18 +277,28 @@ function publishPost() {
   if (!content) { showMsg('Content is required', true); return; }
 
   const vidUrl = document.getElementById('vidUrl').value.trim();
-  const imgPath = imgDataUrl || '';
-  const vidPath = vidDataUrl || vidUrl;
+  const articleId = generateId();
+
+  let finalVideoUrl = '';
+  if (selectedVid) {
+    finalVideoUrl = 'idb:' + articleId;
+    await saveVideoBlob(articleId, selectedVid);
+  } else if (vidUrl) {
+    finalVideoUrl = vidUrl;
+  }
+
+  const imgFolder = document.getElementById('imgFolder').value;
+  const imgPath = selectedImg ? imgFolder + selectedImg.name : '';
 
   // Build HTML content
   let html = '';
 
-  // Video player at top if video selected
-  if (vidPath) {
-    if (vidPath.includes('youtube.com') || vidPath.includes('youtu.be')) {
-      html += `<div style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);aspect-ratio:16/9;"><iframe src="${vidPath}" style="width:100%;height:100%;border:none;" allowfullscreen></iframe></div>`;
+  // Video player at top — only for YouTube/external URLs (idb: handled by article.html)
+  if (finalVideoUrl && !finalVideoUrl.startsWith('idb:')) {
+    if (finalVideoUrl.includes('youtube.com') || finalVideoUrl.includes('youtu.be')) {
+      html += `<div style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);aspect-ratio:16/9;"><iframe src="${finalVideoUrl}" style="width:100%;height:100%;border:none;" allowfullscreen></iframe></div>`;
     } else {
-      html += `<div class="video-player-wrap" style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);"><video controls playsinline preload="metadata" style="width:100%;display:block;border-radius:10px;"><source src="${vidPath}" type="video/mp4">Your browser does not support video.</video><div class="video-watermark">IBC NEWS</div></div>`;
+      html += `<div class="video-player-wrap" style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);"><video controls playsinline preload="metadata" style="width:100%;display:block;border-radius:10px;"><source src="${finalVideoUrl}" type="video/mp4">Your browser does not support video.</video><div class="video-watermark">IBC NEWS</div></div>`;
     }
     html += `<div style="text-align:center;padding:10px 0 18px;"><span style="color:#fff;font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px;letter-spacing:0.3px;">This content is published by ${author}</span></div>`;
   }
@@ -319,14 +312,14 @@ function publishPost() {
   html += textToHtml(content);
 
   const article = {
-    id: generateId(),
+    id: articleId,
     title: title,
     category: document.getElementById('postCategory').value,
     author: author,
     excerpt: content.split('\n')[0].slice(0, 200),
     content: html,
     image: imgPath,
-    videoUrl: vidPath || '',
+    videoUrl: finalVideoUrl,
     tags: document.getElementById('postTags').value.split(',').map(t => t.trim()).filter(Boolean),
     featured: false,
     breaking: false,
