@@ -199,7 +199,14 @@ function editArticle(id) {
   document.getElementById('artCategory').value = a.category;
   document.getElementById('artAuthor').value = a.author;
   document.getElementById('artExcerpt').value = a.excerpt;
-  document.getElementById('artContent').value = a.content;
+  // Strip auto-generated video/image HTML wrapper to show just article text
+  let editContent = a.content;
+  editContent = editContent.replace(/<div class="video-player-wrap"[\s\S]*?<\/div>\s*<\/div>/gi, '');
+  editContent = editContent.replace(/<div style="position:relative[\s\S]*?<\/iframe><\/div>/gi, '');
+  editContent = editContent.replace(/<div style="text-align:center;padding:10px[\s\S]*?<\/span><\/div>/gi, '');
+  editContent = editContent.replace(/<div style="margin:0 0 24px[\s\S]*?<\/div>/gi, '');
+  editContent = editContent.trim();
+  document.getElementById('artContent').value = editContent;
   document.getElementById('artImage').value = a.image || '';
   document.getElementById('artVideo').value = a.videoUrl || '';
   document.getElementById('artTags').value = (a.tags || []).join(', ');
@@ -225,15 +232,40 @@ function saveArticleForm() {
   const editId = document.getElementById('editId').value;
   const existing = editId ? getArticleById(editId) : null;
 
+  // Auto-convert plain text to HTML
+  let htmlContent = content;
+  if (!content.startsWith('<')) {
+    const paras = content.split(/\n\s*\n/).filter(p => p.trim());
+    htmlContent = paras.map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`).join('\n');
+  }
+
+  const videoUrl = document.getElementById('artVideo').value.trim();
+  const imgUrl = document.getElementById('artImage').value.trim();
+
+  // Auto-build video player + image into content
+  let fullContent = '';
+  if (videoUrl && !htmlContent.includes('<video') && !htmlContent.includes('<iframe')) {
+    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+      fullContent += `<div style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);aspect-ratio:16/9;"><iframe src="${videoUrl}" style="width:100%;height:100%;border:none;" allowfullscreen></iframe></div>`;
+    } else {
+      fullContent += `<div class="video-player-wrap" style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);"><video controls playsinline preload="metadata" style="width:100%;display:block;border-radius:10px;"><source src="${videoUrl}" type="video/mp4">Your browser does not support video.</video><div class="video-watermark">IBC NEWS</div></div>`;
+    }
+    fullContent += `<div style="text-align:center;padding:10px 0 18px;"><span style="color:#fff;font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px;letter-spacing:0.3px;">This content is published by ${author || 'IBC News Desk'}</span></div>`;
+  }
+  if (imgUrl && !htmlContent.includes('<img')) {
+    fullContent += `<div style="margin:0 0 24px;text-align:center;"><img src="${imgUrl}" alt="${title}" style="width:100%;max-width:900px;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,0.15);"></div>`;
+  }
+  fullContent += htmlContent;
+
   const article = {
     id: editId || generateId(),
     title,
     category,
     author: author || 'IBC News Desk',
     excerpt,
-    content: content.startsWith('<') ? content : `<p>${content.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`,
-    image: document.getElementById('artImage').value.trim(),
-    videoUrl: document.getElementById('artVideo').value.trim(),
+    content: fullContent,
+    image: imgUrl,
+    videoUrl: videoUrl,
     tags: document.getElementById('artTags').value.split(',').map(t => t.trim()).filter(Boolean),
     featured: document.getElementById('artFeatured').checked,
     breaking: document.getElementById('artBreaking').checked,
@@ -256,6 +288,94 @@ function confirmDelete(id) {
     renderDashboard();
     renderAllArticles();
   }
+}
+
+// --- AI Content Generation (Gemini) ---
+function getGeminiKey() {
+  return localStorage.getItem('ibc_gemini_key') || '';
+}
+
+function setGeminiKey(key) {
+  localStorage.setItem('ibc_gemini_key', key);
+}
+
+async function aiGenerateContent() {
+  const title = document.getElementById('artTitle').value.trim();
+  const summary = document.getElementById('artExcerpt').value.trim();
+  if (!title) { showToast('Title likho pehle, AI usse article generate karega.'); return; }
+
+  let apiKey = getGeminiKey();
+  if (!apiKey) {
+    apiKey = prompt('Gemini API Key enter karo (ek baar dena hoga, save ho jaayegi):');
+    if (!apiKey) return;
+    setGeminiKey(apiKey);
+  }
+
+  const btn = document.getElementById('aiGenBtn');
+  const status = document.getElementById('aiStatus');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
+  status.textContent = 'Gemini se content generate ho raha hai...';
+
+  const promptText = 'You are a professional news journalist writing for IBC News Online. Write a detailed news article based on this:\n\nTitle: ' + title + (summary ? '\nSummary: ' + summary : '') + '\n\nWrite 4-6 paragraphs of professional news content in plain text. Each paragraph separated by a blank line. Do NOT use any HTML tags. Do NOT use markdown. Just plain text paragraphs. Write in a professional, objective news reporting style. Include relevant details, quotes where appropriate, and context.';
+
+  try {
+    const ac = new AbortController();
+    setTimeout(() => ac.abort(), 60000);
+    const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=' + apiKey, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: ac.signal,
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: promptText }] }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
+      })
+    });
+
+    if (!resp.ok) {
+      if (resp.status === 400 || resp.status === 403 || resp.status === 404) {
+        localStorage.removeItem('ibc_gemini_key');
+        throw new Error('Invalid API key — dobara enter karo next time');
+      }
+      throw new Error('API error: ' + resp.status);
+    }
+
+    const data = await resp.json();
+    const text = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text || '';
+    if (!text) throw new Error('Empty response');
+
+    document.getElementById('artContent').value = text.trim();
+    if (!summary) {
+      document.getElementById('artExcerpt').value = text.split('\n')[0].slice(0, 200);
+    }
+    status.textContent = 'Content generated!';
+    showToast('AI content generated!');
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
+    showToast('AI generation failed.');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✨ AI Generate from Title';
+}
+
+// --- Video File Upload ---
+function handleVideoFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const preview = document.getElementById('videoPreview');
+  const wrap = document.getElementById('videoPreviewWrap');
+  const url = URL.createObjectURL(file);
+  preview.src = url;
+  wrap.style.display = 'block';
+  document.getElementById('artVideo').value = 'videos/' + file.name;
+}
+
+function clearVideoFile() {
+  const input = document.getElementById('artVideoFile');
+  input.value = '';
+  document.getElementById('videoPreview').src = '';
+  document.getElementById('videoPreviewWrap').style.display = 'none';
 }
 
 // --- Breaking News ---

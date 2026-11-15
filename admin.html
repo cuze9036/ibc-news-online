@@ -25,6 +25,7 @@
         <a href="#" onclick="showView('categories', this, event)">&#128193; Categories</a>
         <a href="#" onclick="showView('aggregator', this, event)">&#128225; News Aggregator</a>
         <a href="#" onclick="showView('settings', this, event)">&#9881; Settings</a>
+        <a href="post.html" style="border-top:1px solid rgba(255,255,255,0.08);margin-top:8px;padding-top:14px;">&#9998; Quick Post</a>
       </nav>
       <div style="margin-top:auto;padding:20px;border-top:1px solid rgba(255,255,255,0.1);margin-top:40px;">
         <a href="index.html" style="color:#aaa;font-size:13px;">&#8592; Back to Site</a>
@@ -108,51 +109,58 @@
         <div class="editor-wrap">
           <h2 id="editorTitle">Create New Article</h2>
           <input type="hidden" id="editId" value="">
-          <div class="form-row">
-            <div class="form-group full">
-              <label>Title *</label>
-              <input type="text" id="artTitle" placeholder="Enter article title...">
+          <div class="form-group" style="margin-bottom:20px;">
+            <label>Title *</label>
+            <input type="text" id="artTitle" placeholder="Article title..." style="font-size:16px;padding:12px 16px;">
+          </div>
+          <div class="form-group" style="margin-bottom:20px;">
+            <label>Summary *</label>
+            <textarea id="artExcerpt" rows="2" placeholder="Short summary of the article..."></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:20px;">
+            <label>Article Content * <span style="font-size:11px;color:#888;font-weight:400;">(plain text — auto-converts to HTML)</span></label>
+            <div style="display:flex;gap:10px;margin-bottom:8px;">
+              <button type="button" class="btn-new" onclick="aiGenerateContent()" id="aiGenBtn" style="font-size:12px;padding:6px 14px;">&#10024; AI Generate from Title</button>
+              <span id="aiStatus" style="font-size:12px;color:#888;align-self:center;"></span>
             </div>
+            <textarea id="artContent" rows="10" placeholder="Write your article here — or click AI Generate to auto-write from your title.&#10;&#10;Each paragraph separated by a blank line.&#10;No HTML needed — just type normally."></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:20px;">
+            <label>Video <span style="font-size:11px;color:#888;font-weight:400;">(pick a file or paste URL)</span></label>
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;">
+              <input type="file" id="artVideoFile" accept="video/mp4,video/webm,video/ogg" onchange="handleVideoFileSelect(this)" style="flex:1;">
+              <button type="button" class="btn-cancel" onclick="clearVideoFile()" style="width:auto;padding:6px 14px;">Clear</button>
+            </div>
+            <input type="text" id="artVideo" placeholder="Or paste: https://youtube.com/embed/... or videos/filename.mp4" style="margin-top:4px;">
+            <div id="videoPreviewWrap" style="display:none;margin-top:10px;max-width:360px;border-radius:8px;overflow:hidden;background:#000;">
+              <video id="videoPreview" controls style="width:100%;display:block;" preload="metadata"></video>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:20px;">
+            <label>Image URL <span style="font-size:11px;color:#888;font-weight:400;">(optional)</span></label>
+            <input type="text" id="artImage" placeholder="https://... or images/filename.jpg">
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Category *</label>
+              <label>Category</label>
               <select id="artCategory"></select>
             </div>
             <div class="form-group">
-              <label>Author *</label>
+              <label>Published By</label>
               <input type="text" id="artAuthor" placeholder="Author name" value="IBC News Desk">
             </div>
           </div>
-          <div class="form-group">
-            <label>Excerpt / Summary *</label>
-            <textarea id="artExcerpt" rows="3" placeholder="Brief summary of the article..."></textarea>
-          </div>
-          <div class="form-group">
-            <label>Full Content (HTML supported) *</label>
-            <textarea id="artContent" rows="12" placeholder="<p>Write your article content here...</p>"></textarea>
-          </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Image URL (optional)</label>
-              <input type="text" id="artImage" placeholder="https://...">
-            </div>
-            <div class="form-group">
-              <label>Video Embed URL (optional)</label>
-              <input type="text" id="artVideo" placeholder="https://www.youtube.com/embed/...">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Tags (comma separated)</label>
-              <input type="text" id="artTags" placeholder="politics, economy, breaking">
+              <label>Tags <span style="font-size:11px;color:#888;font-weight:400;">(comma separated)</span></label>
+              <input type="text" id="artTags" placeholder="news, breaking, politics">
             </div>
             <div class="form-group">
               <label>Publish Date</label>
               <input type="datetime-local" id="artDate">
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group" style="margin-bottom:20px;">
             <div class="checkbox-group">
               <label><input type="checkbox" id="artFeatured"> Featured Article</label>
               <label><input type="checkbox" id="artBreaking"> Breaking News</label>
@@ -323,6 +331,6 @@
 
   <script src="js/data.js?v=7"></script>
   <script src="js/aggregator.js?v=5"></script>
-  <script src="js/admin.js?v=6"></script>
+  <script src="js/admin.js?v=13"></script>
 </body>
 </html>

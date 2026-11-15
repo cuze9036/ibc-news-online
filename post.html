@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Post — IBC News</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23D32F2F' rx='12' width='100' height='100'/><text x='50' y='68' font-size='40' font-weight='900' fill='white' text-anchor='middle' font-family='Arial'>IBC</text></svg>">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0f1117;color:#e4e4e7;min-height:100vh}
+    .top{background:#D32F2F;padding:14px 24px;display:flex;justify-content:space-between;align-items:center}
+    .top h1{font-size:18px;color:#fff;font-weight:800;letter-spacing:0.5px}
+    .top a{color:#fff;font-size:13px;text-decoration:none;opacity:0.85}
+    .top a:hover{opacity:1}
+    .wrap{max-width:700px;margin:30px auto;padding:0 20px}
+    .card{background:#1a1b23;border:1px solid #2a2b35;border-radius:12px;padding:28px;margin-bottom:20px}
+    .card h2{font-size:16px;margin-bottom:20px;color:#fff;border-bottom:1px solid #2a2b35;padding-bottom:12px}
+    label{display:block;font-size:13px;color:#9ca3af;margin-bottom:6px;font-weight:500}
+    input[type="text"],input[type="datetime-local"],textarea,select{width:100%;padding:10px 14px;background:#12131a;border:1px solid #2a2b35;border-radius:8px;color:#e4e4e7;font-size:14px;font-family:inherit;outline:none;transition:border 0.2s}
+    input:focus,textarea:focus,select:focus{border-color:#D32F2F}
+    textarea{resize:vertical;line-height:1.6}
+    .field{margin-bottom:18px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:600px){.row{grid-template-columns:1fr}}
+    .file-box{border:2px dashed #2a2b35;border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border 0.2s;position:relative}
+    .file-box:hover{border-color:#D32F2F}
+    .file-box input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .file-box .icon{font-size:28px;margin-bottom:6px}
+    .file-box p{font-size:13px;color:#9ca3af}
+    .file-box .name{font-size:12px;color:#D32F2F;margin-top:6px;word-break:break-all}
+    .preview{margin-top:12px;border-radius:8px;overflow:hidden;background:#000;max-width:100%}
+    .preview img{width:100%;display:block;max-height:300px;object-fit:cover}
+    .preview video{width:100%;display:block;max-height:300px}
+    .folder-row{display:flex;gap:10px;align-items:center;margin-top:8px}
+    .folder-row select{width:auto;min-width:140px}
+    .folder-row span{font-size:12px;color:#6b7280}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s}
+    .btn-post{background:#D32F2F;color:#fff;width:100%;justify-content:center;font-size:16px;padding:14px}
+    .btn-post:hover{background:#b71c1c}
+    .btn-post:disabled{opacity:0.5;cursor:not-allowed}
+    .actions{margin-top:8px}
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:600;z-index:999;display:none;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
+    .toast.error{background:#D32F2F}
+    .result{margin-top:16px;padding:16px;background:#12131a;border:1px solid #2a2b35;border-radius:8px;display:none}
+    .result a{color:#D32F2F;font-weight:600;text-decoration:none}
+    .result a:hover{text-decoration:underline}
+    .tag{display:inline-block;background:#D32F2F22;color:#D32F2F;font-size:11px;padding:3px 10px;border-radius:20px;margin:2px}
+  </style>
+</head>
+<body>
+
+<div class="top">
+  <h1>&#9998; Quick Post</h1>
+  <div>
+    <a href="admin.html">Admin Panel</a> &nbsp;|&nbsp; <a href="index.html">View Site</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- Title + Meta -->
+  <div class="card">
+    <h2>&#128196; Article Details</h2>
+    <div class="field">
+      <label>Title</label>
+      <input type="text" id="postTitle" placeholder="Article title...">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Published By</label>
+        <input type="text" id="postAuthor" value="IBC News Desk" placeholder="Author name">
+      </div>
+      <div class="field">
+        <label>Publish Date</label>
+        <input type="datetime-local" id="postDate">
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Category</label>
+        <select id="postCategory"></select>
+      </div>
+      <div class="field">
+        <label>Tags (comma separated)</label>
+        <input type="text" id="postTags" placeholder="news, breaking, politics">
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="card">
+    <h2>&#9999; Content</h2>
+    <div class="field">
+      <label>Article Text <span style="font-size:11px;color:#9ca3af;">(plain text — auto-converts to HTML)</span></label>
+      <div style="display:flex;gap:10px;margin-bottom:8px;">
+        <button type="button" class="btn" onclick="aiGenerate()" id="aiBtn" style="background:#7c3aed;color:#fff;padding:8px 16px;font-size:13px;">&#10024; AI Generate from Title</button>
+        <span id="aiStatus" style="font-size:12px;color:#9ca3af;align-self:center;"></span>
+      </div>
+      <textarea id="postContent" rows="8" placeholder="Write your article here — or click AI Generate.&#10;&#10;Each paragraph separated by a blank line.&#10;No HTML needed."></textarea>
+    </div>
+  </div>
+
+  <!-- Image -->
+  <div class="card">
+    <h2>&#128247; Image (optional)</h2>
+    <div class="file-box" id="imgBox">
+      <input type="file" id="imgFile" accept="image/*" onchange="previewFile(this,'img')">
+      <div class="icon">&#128247;</div>
+      <p>Click or drag an image here</p>
+      <div class="name" id="imgName"></div>
+    </div>
+    <div class="folder-row">
+      <label style="margin:0;white-space:nowrap">Save to folder:</label>
+      <select id="imgFolder">
+        <option value="images/">images/</option>
+        <option value="media/">media/</option>
+        <option value="assets/">assets/</option>
+        <option value="uploads/">uploads/</option>
+      </select>
+      <span>File path: <code id="imgPath">—</code></span>
+    </div>
+    <div class="preview" id="imgPreview" style="display:none"><img id="imgPreviewEl"></div>
+  </div>
+
+  <!-- Video -->
+  <div class="card">
+    <h2>&#127909; Video (optional)</h2>
+    <div class="file-box" id="vidBox">
+      <input type="file" id="vidFile" accept="video/mp4,video/webm" onchange="previewFile(this,'vid')">
+      <div class="icon">&#127909;</div>
+      <p>Click or drag a video here</p>
+      <div class="name" id="vidName"></div>
+    </div>
+    <div class="folder-row">
+      <label style="margin:0;white-space:nowrap">Save to folder:</label>
+      <select id="vidFolder">
+        <option value="videos/">videos/</option>
+        <option value="media/">media/</option>
+        <option value="assets/">assets/</option>
+        <option value="uploads/">uploads/</option>
+      </select>
+      <span>File path: <code id="vidPath">—</code></span>
+    </div>
+    <div class="preview" id="vidPreview" style="display:none"><video id="vidPreviewEl" controls preload="metadata"></video></div>
+    <div class="field" style="margin-top:14px">
+      <label>Or paste a YouTube / embed URL</label>
+      <input type="text" id="vidUrl" placeholder="https://www.youtube.com/embed/...">
+    </div>
+  </div>
+
+  <!-- Publish -->
+  <div class="card">
+    <div class="actions">
+      <button class="btn btn-post" id="publishBtn" onclick="publishPost()">&#128640; Publish Article</button>
+    </div>
+    <div class="result" id="resultBox">
+      <p style="margin-bottom:8px;color:#22c55e;font-weight:600">&#10003; Article published!</p>
+      <p><a id="resultLink" href="#" target="_blank">Open Article &#8594;</a></p>
+      <p style="margin-top:8px;font-size:12px;color:#6b7280" id="resultNote"></p>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/data.js?v=7"></script>
+<script>
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  initData();
+  const sel = document.getElementById('postCategory');
+  getCategories().forEach(c => {
+    sel.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+  });
+  document.getElementById('postDate').value = new Date().toISOString().slice(0, 16);
+});
+
+// AI Generate
+async function aiGenerate() {
+  const title = document.getElementById('postTitle').value.trim();
+  const summary = document.getElementById('postContent').value.trim();
+  if (!title) { showMsg('Title likho pehle', true); return; }
+
+  let apiKey = localStorage.getItem('ibc_gemini_key') || '';
+  if (!apiKey) {
+    apiKey = prompt('Gemini API Key enter karo (ek baar dena hoga, save ho jaayegi):');
+    if (!apiKey) return;
+    localStorage.setItem('ibc_gemini_key', apiKey);
+  }
+
+  const btn = document.getElementById('aiBtn');
+  const st = document.getElementById('aiStatus');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
+  st.textContent = 'Gemini se generate ho raha hai...';
+
+  const p = 'You are a professional news journalist writing for IBC News Online. Write a detailed news article based on this:\n\nTitle: ' + title + '\n\nWrite 4-6 paragraphs of professional news content in plain text. Each paragraph separated by a blank line. No HTML. No markdown. Plain text only. Professional news reporting style.';
+
+  try {
+    const ac = new AbortController();
+    setTimeout(() => ac.abort(), 60000);
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=' + apiKey, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: ac.signal,
+      body: JSON.stringify({ contents: [{ parts: [{ text: p }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1500 } })
+    });
+    if (!r.ok) {
+      if (r.status === 400 || r.status === 403 || r.status === 404) { localStorage.removeItem('ibc_gemini_key'); throw new Error('Invalid key — dobara enter karo'); }
+      throw new Error('API error: ' + r.status);
+    }
+    const d = await r.json();
+    const t = d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts && d.candidates[0].content.parts[0] && d.candidates[0].content.parts[0].text || '';
+    if (!t) throw new Error('Empty response');
+    document.getElementById('postContent').value = t.trim();
+    st.textContent = 'Content generated!';
+    showMsg('AI content generated!');
+  } catch (e) {
+    st.textContent = 'Error: ' + e.message;
+    showMsg('AI failed.', true);
+  }
+  btn.disabled = false;
+  btn.textContent = '✨ AI Generate from Title';
+}
+
+// File preview
+let selectedImg = null;
+let selectedVid = null;
+
+function previewFile(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  if (type === 'img') {
+    selectedImg = file;
+    document.getElementById('imgName').textContent = file.name;
+    document.getElementById('imgPreviewEl').src = url;
+    document.getElementById('imgPreview').style.display = 'block';
+    updatePath('img');
+  } else {
+    selectedVid = file;
+    document.getElementById('vidName').textContent = file.name;
+    document.getElementById('vidPreviewEl').src = url;
+    document.getElementById('vidPreview').style.display = 'block';
+    updatePath('vid');
+  }
+}
+
+function updatePath(type) {
+  if (type === 'img' && selectedImg) {
+    const folder = document.getElementById('imgFolder').value;
+    document.getElementById('imgPath').textContent = folder + selectedImg.name;
+  }
+  if (type === 'vid' && selectedVid) {
+    const folder = document.getElementById('vidFolder').value;
+    document.getElementById('vidPath').textContent = folder + selectedVid.name;
+  }
+}
+
+document.getElementById('imgFolder').addEventListener('change', () => updatePath('img'));
+document.getElementById('vidFolder').addEventListener('change', () => updatePath('vid'));
+
+// Plain text to HTML
+function textToHtml(text) {
+  const paras = text.split(/\n\s*\n/).filter(p => p.trim());
+  return paras.map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`).join('\n');
+}
+
+// Publish
+function publishPost() {
+  const title = document.getElementById('postTitle').value.trim();
+  const content = document.getElementById('postContent').value.trim();
+  const author = document.getElementById('postAuthor').value.trim() || 'IBC News Desk';
+
+  if (!title) { showMsg('Title is required', true); return; }
+  if (!content) { showMsg('Content is required', true); return; }
+
+  const imgFolder = document.getElementById('imgFolder').value;
+  const vidFolder = document.getElementById('vidFolder').value;
+  const imgPath = selectedImg ? imgFolder + selectedImg.name : '';
+  const vidUrl = document.getElementById('vidUrl').value.trim();
+  const vidPath = selectedVid ? vidFolder + selectedVid.name : vidUrl;
+
+  // Build HTML content
+  let html = '';
+
+  // Video player at top if video selected
+  if (vidPath) {
+    if (vidPath.includes('youtube.com') || vidPath.includes('youtu.be')) {
+      html += `<div style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);aspect-ratio:16/9;"><iframe src="${vidPath}" style="width:100%;height:100%;border:none;" allowfullscreen></iframe></div>`;
+    } else {
+      html += `<div class="video-player-wrap" style="position:relative;width:100%;max-width:900px;margin:0 auto 28px;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 4px 24px rgba(0,0,0,0.25);"><video controls playsinline preload="metadata" style="width:100%;display:block;border-radius:10px;"><source src="${vidPath}" type="video/mp4">Your browser does not support video.</video><div class="video-watermark">IBC NEWS</div></div>`;
+    }
+    html += `<div style="text-align:center;padding:10px 0 18px;"><span style="color:#fff;font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px;letter-spacing:0.3px;">This content is published by ${author}</span></div>`;
+  }
+
+  // Image if provided
+  if (imgPath) {
+    html += `<div style="margin:0 0 24px;text-align:center;"><img src="${imgPath}" alt="${title}" style="width:100%;max-width:900px;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,0.15);"></div>`;
+  }
+
+  // Article text
+  html += textToHtml(content);
+
+  const article = {
+    id: generateId(),
+    title: title,
+    category: document.getElementById('postCategory').value,
+    author: author,
+    excerpt: content.split('\n')[0].slice(0, 200),
+    content: html,
+    image: imgPath,
+    videoUrl: vidPath || '',
+    tags: document.getElementById('postTags').value.split(',').map(t => t.trim()).filter(Boolean),
+    featured: false,
+    breaking: false,
+    publishedAt: new Date(document.getElementById('postDate').value).toISOString(),
+    views: 0
+  };
+
+  saveArticle(article);
+  showMsg('Article published!');
+
+  const url = getArticleUrl(article);
+  document.getElementById('resultLink').href = url;
+  const notes = [];
+  if (selectedImg) notes.push('Put ' + selectedImg.name + ' in your repo\'s ' + imgFolder + ' folder');
+  if (selectedVid) notes.push('Put ' + selectedVid.name + ' in your repo\'s ' + vidFolder + ' folder');
+  document.getElementById('resultNote').textContent = notes.join(' | ');
+  document.getElementById('resultBox').style.display = 'block';
+
+  document.getElementById('publishBtn').disabled = true;
+  setTimeout(() => { document.getElementById('publishBtn').disabled = false; }, 2000);
+}
+
+function showMsg(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+</script>
+</body>
+</html>
